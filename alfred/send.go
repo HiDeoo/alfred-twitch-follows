@@ -7,6 +7,21 @@ import (
 	"os"
 )
 
+type Result struct {
+	Items interface{} `json:"items"`
+}
+
+type Item struct {
+	Title    string `json:"title"`
+	SubTitle string `json:"subtitle"`
+}
+
+type Error struct {
+	Title    string `json:"title"`
+	SubTitle string `json:"subtitle"`
+	Valid    bool   `json:"valid"`
+}
+
 func SendResult(items []Item) {
 	send(Result{Items: items})
 }
@@ -33,19 +48,4 @@ func send(data interface{}) {
 	}
 
 	log.Panicln(err)
-}
-
-type Result struct {
-	Items interface{} `json:"items"`
-}
-
-type Item struct {
-	Title    string `json:"title"`
-	SubTitle string `json:"subtitle"`
-}
-
-type Error struct {
-	Title    string `json:"title"`
-	SubTitle string `json:"subtitle"`
-	Valid    bool   `json:"valid"`
 }

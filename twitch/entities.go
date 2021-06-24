@@ -41,8 +41,3 @@ type Error struct {
 type Pagination struct {
 	Cursor string `json:"cursor"`
 }
-
-type QueryParam struct {
-	Key   string
-	Value string
-}

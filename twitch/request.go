@@ -9,6 +9,11 @@ import (
 	"os"
 )
 
+type QueryParam struct {
+	Key   string
+	Value string
+}
+
 func get(httpClient *http.Client, path string, queryParams ...*QueryParam) ([]byte, error) {
 	req, err := http.NewRequest(http.MethodGet, apiBaseURL+path, nil)
 
