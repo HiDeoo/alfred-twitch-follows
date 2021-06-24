@@ -1,19 +1,12 @@
 package main
 
 import (
-	"net/http"
-	"time"
-
 	"github.com/HiDeoo/alfred-twitch-follows/alfred"
 	"github.com/HiDeoo/alfred-twitch-follows/twitch"
 )
 
 func main() {
-	httpClient := &http.Client{
-		Timeout: time.Second * 5,
-	}
-
-	follows, err := twitch.GetFollows(httpClient)
+	follows, err := twitch.GetFollows()
 
 	if err != nil {
 		alfred.SendError(err)

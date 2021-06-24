@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"time"
 )
 
 type QueryParam struct {
@@ -14,7 +15,19 @@ type QueryParam struct {
 	Value string
 }
 
-func get(httpClient *http.Client, path string, queryParams ...*QueryParam) ([]byte, error) {
+type HTTPClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
+var Client HTTPClient
+
+func init() {
+	Client = &http.Client{
+		Timeout: time.Second * 5,
+	}
+}
+
+func get(path string, queryParams ...*QueryParam) ([]byte, error) {
 	req, err := http.NewRequest(http.MethodGet, apiBaseURL+path, nil)
 
 	if err != nil {
@@ -34,7 +47,7 @@ func get(httpClient *http.Client, path string, queryParams ...*QueryParam) ([]by
 	req.Header.Set("Client-ID", os.Getenv("TWITCH_CLIENT_ID"))
 	req.Header.Set("Authorization", "Bearer "+os.Getenv("TWITCH_OAUTH_TOKEN"))
 
-	res, err := httpClient.Do(req)
+	res, err := Client.Do(req)
 
 	if err != nil {
 		return nil, err

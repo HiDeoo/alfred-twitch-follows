@@ -3,13 +3,12 @@ package twitch
 import (
 	"encoding/json"
 	"errors"
-	"net/http"
 )
 
 const apiBaseURL = "https://api.twitch.tv/helix/"
 
-func GetFollows(httpClient *http.Client) ([]Follow, error) {
-	currentUser, err := getCurrentUser(httpClient)
+func GetFollows() ([]Follow, error) {
+	currentUser, err := getCurrentUser()
 
 	if err != nil {
 		return nil, err
@@ -19,7 +18,7 @@ func GetFollows(httpClient *http.Client) ([]Follow, error) {
 	var allFollows []Follow
 
 	for {
-		follows, err := getFollowsWithPagination(httpClient, currentUser.Id, cursor)
+		follows, err := getFollowsWithPagination(currentUser.Id, cursor)
 
 		if err != nil {
 			return nil, err
@@ -37,9 +36,9 @@ func GetFollows(httpClient *http.Client) ([]Follow, error) {
 	return allFollows, nil
 }
 
-func getFollowsWithPagination(httpClient *http.Client, userID string, cursor string) (*Follows, error) {
+func getFollowsWithPagination(userID string, cursor string) (*Follows, error) {
 	data, err := get(
-		httpClient, "users/follows",
+		"users/follows",
 		&QueryParam{"from_id", userID},
 		&QueryParam{"first", "100"},
 		&QueryParam{"after", cursor},
@@ -58,8 +57,8 @@ func getFollowsWithPagination(httpClient *http.Client, userID string, cursor str
 	return &follows, nil
 }
 
-func getCurrentUser(httpClient *http.Client) (*User, error) {
-	data, err := get(httpClient, "users")
+func getCurrentUser() (*User, error) {
+	data, err := get("users")
 
 	if err != nil {
 		return nil, err
