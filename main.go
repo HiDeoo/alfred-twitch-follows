@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -20,5 +19,18 @@ func main() {
 		alfred.SendError(err)
 	}
 
-	fmt.Println(follows)
+	alfred.SendResult(MapFollowsToItems(follows))
+}
+
+func MapFollowsToItems(from []twitch.Follow) []alfred.Item {
+	items := make([]alfred.Item, len(from))
+
+	for i, follow := range from {
+		items[i] = alfred.Item{
+			Title:    follow.ToName,
+			SubTitle: "test",
+		}
+	}
+
+	return items
 }

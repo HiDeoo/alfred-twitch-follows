@@ -7,8 +7,12 @@ import (
 	"os"
 )
 
+func SendResult(items []Item) {
+	send(Result{Items: items})
+}
+
 func SendError(err error) {
-	result := Result{
+	send(Result{
 		Items: []interface{}{
 			Error{
 				Title:    "Something went wrong!",
@@ -16,9 +20,11 @@ func SendError(err error) {
 				Valid:    false,
 			},
 		},
-	}
+	})
+}
 
-	bytes, err := json.Marshal(result)
+func send(data interface{}) {
+	bytes, err := json.Marshal(data)
 
 	if err == nil {
 		fmt.Println(string(bytes))
@@ -30,7 +36,12 @@ func SendError(err error) {
 }
 
 type Result struct {
-	Items []interface{} `json:"items"`
+	Items interface{} `json:"items"`
+}
+
+type Item struct {
+	Title    string `json:"title"`
+	SubTitle string `json:"subtitle"`
 }
 
 type Error struct {
