@@ -31,10 +31,13 @@ var getFollowsTests = []struct {
 	name        string
 	followCount int
 	pageCount   int
+	user        string
+	success     bool
 }{
-	{"ReturnNoFollows", 0, 1},
-	{"ReturnFollows", 2, 1},
-	{"ReturnFollowsWithPagination", 2, 2},
+	{"ReturnNoFollows", 0, 1, userJson, true},
+	{"ReturnFollows", 2, 1, userJson, true},
+	{"ReturnFollowsWithPagination", 2, 2, userJson, true},
+	{"ReturnError", 2, 1, `{ "data": [] }`, false},
 }
 
 func TestGetFollows(t *testing.T) {
@@ -42,38 +45,43 @@ func TestGetFollows(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			mockClient := new(MockClient)
 			Client = mockClient
-			mockClient.On("Do", mock.Anything).Return(mockResponse(200, userJson), nil).Once()
+			mockClient.On("Do", mock.Anything).Return(mockResponse(200, test.user), nil).Once()
 
-			followsInput := []Follow{}
-
-			for i := 0; i < test.followCount; i++ {
-				followJson := Follow{
-					FromId:     "123456789",
-					FromLogin:  "user",
-					ToId:       fmt.Sprintf("1234560%d", i),
-					ToLogin:    fmt.Sprintf("user%d", i),
-					ToName:     fmt.Sprintf("User%d", i),
-					FollowedAt: fmt.Sprintf("2020-03-01T02:23:4%d.009756Z", i),
-				}
-
-				followsInput = append(followsInput, followJson)
-			}
-
-			followsJson, err := json.Marshal(followsInput)
-			assert.Nil(t, err)
-
-			var pagination string
+			var cursor string
+			followIndex := 0
+			followsPerPage := make([][]Follow, test.pageCount)
 
 			for i := 0; i < test.pageCount; i++ {
-				if test.pageCount > 1 && i == test.pageCount-1 {
-					pagination = "abcdefgh"
+				followsPerPage[i] = []Follow{}
+
+				for j := 0; j < test.followCount; j++ {
+					followJson := Follow{
+						FromId:     "123456789",
+						FromLogin:  "user",
+						ToId:       fmt.Sprintf("1234560%d", followIndex),
+						ToLogin:    fmt.Sprintf("user%d", followIndex),
+						ToName:     fmt.Sprintf("User%d", followIndex),
+						FollowedAt: fmt.Sprintf("2020-03-01T02:23:4%d.009756Z", followIndex),
+					}
+
+					followsPerPage[i] = append(followsPerPage[i], followJson)
+					followIndex++
+				}
+
+				pageFollowsJson, err := json.Marshal(followsPerPage[i])
+				assert.Nil(t, err)
+
+				if test.pageCount > 1 && i != test.pageCount-1 {
+					cursor = "abcdefgh"
+				} else {
+					cursor = ""
 				}
 
 				json := fmt.Sprintf(
 					`{ "total": %d, "data": %s, "pagination": { "cursor": "%s" } }`,
-					len(followsInput),
-					followsJson,
-					pagination,
+					len(followsPerPage[i]),
+					pageFollowsJson,
+					cursor,
 				)
 
 				mockClient.On("Do", mock.Anything).Return(mockResponse(200, json), nil).Once()
@@ -81,9 +89,21 @@ func TestGetFollows(t *testing.T) {
 
 			follows, err := GetFollows()
 
-			assert.Equal(t, test.followCount, len(follows))
-			assert.ElementsMatch(t, followsInput, follows)
-			assert.Nil(t, err)
+			if test.success {
+				assert.Equal(t, test.followCount*test.pageCount, len(follows))
+				assert.Nil(t, err)
+
+				expectedFollows := []Follow{}
+
+				for _, pageFollows := range followsPerPage {
+					expectedFollows = append(expectedFollows, pageFollows...)
+				}
+
+				assert.ElementsMatch(t, expectedFollows, follows)
+			} else {
+				assert.Nil(t, follows)
+				assert.NotNil(t, err)
+			}
 		})
 	}
 }
