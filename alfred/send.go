@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"os"
 )
 
 type Result struct {
@@ -44,7 +43,7 @@ func send(data interface{}) {
 	if err == nil {
 		fmt.Println(string(bytes))
 
-		os.Exit(1)
+		return
 	}
 
 	log.Panicln(err)
