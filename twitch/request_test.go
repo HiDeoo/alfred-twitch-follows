@@ -1,49 +1,57 @@
 package twitch
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
-func TestGetToReturnError(t *testing.T) {
-	statusCode := 500
-
-	mockClient := new(MockClient)
-	Client = mockClient
-	mockClient.On("Do", mock.Anything).Return(mockResponse(statusCode, ""), nil)
-
-	data, err := get("users")
-
-	assert.Nil(t, data)
-	assert.EqualValues(t, fmt.Sprintf("Unable to fetch Twitch data (error %d)", statusCode), err.Error())
-}
-
-func TestGetToReturnTwitchError(t *testing.T) {
-	mockClient := new(MockClient)
-	Client = mockClient
-	mockClient.On("Do", mock.Anything).Return(mockResponse(
+var tests = []struct {
+	name       string
+	statusCode int
+	in         string
+	success    bool
+	out        string
+}{
+	{
+		"ReturnError",
+		500,
+		"",
+		false,
+		"Unable to fetch Twitch data (error 500)"},
+	{
+		"ReturnTwitchError",
 		401,
 		`{ "error": "Unauthorized", "status": 401, "message": "OAuth token is missing" }`,
-	), nil)
-
-	data, err := get("users")
-
-	assert.Nil(t, data)
-	assert.EqualValues(t, "OAuth token is missing", err.Error())
+		false,
+		"OAuth token is missing",
+	},
+	{
+		"ReturnData",
+		200,
+		`{ "data": "the data" }`,
+		true,
+		"",
+	},
 }
 
-func TestGetToReturnData(t *testing.T) {
-	json := `{ "data": "the data" }`
+func TestGet(t *testing.T) {
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			mockClient := new(MockClient)
+			Client = mockClient
+			mockClient.On("Do", mock.Anything).Return(mockResponse(test.statusCode, test.in), nil)
 
-	mockClient := new(MockClient)
-	Client = mockClient
-	mockClient.On("Do", mock.Anything).Return(mockResponse(200, json), nil)
+			data, err := get("users")
 
-	data, err := get("users")
-
-	assert.EqualValues(t, json, data)
-	assert.Nil(t, err)
+			if test.success {
+				assert.EqualValues(t, test.in, data)
+				assert.Nil(t, err)
+			} else {
+				assert.Nil(t, data)
+				assert.EqualValues(t, test.out, err.Error())
+			}
+		})
+	}
 }
