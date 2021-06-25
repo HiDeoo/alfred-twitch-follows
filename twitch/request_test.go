@@ -1,6 +1,7 @@
 package twitch
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -8,24 +9,36 @@ import (
 )
 
 var tests = []struct {
-	name       string
-	statusCode int
-	in         string
-	success    bool
-	out        string
+	name        string
+	statusCode  int
+	in          string
+	success     bool
+	out         string
+	clientError bool
 }{
 	{
-		"ReturnError",
+		"ReturnClientError",
 		500,
 		"",
 		false,
-		"Unable to fetch Twitch data (error 500)"},
+		"Client error",
+		true,
+	},
+	{
+		"ReturnNetworkError",
+		500,
+		"",
+		false,
+		"Unable to fetch Twitch data (error 500)",
+		false,
+	},
 	{
 		"ReturnTwitchError",
 		401,
 		`{ "error": "Unauthorized", "status": 401, "message": "OAuth token is missing" }`,
 		false,
 		"OAuth token is missing",
+		false,
 	},
 	{
 		"ReturnData",
@@ -33,6 +46,7 @@ var tests = []struct {
 		`{ "data": "the data" }`,
 		true,
 		"",
+		false,
 	},
 }
 
@@ -41,7 +55,11 @@ func TestGet(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			mockClient := new(MockClient)
 			Client = mockClient
-			mockClient.On("Do", mock.Anything).Return(mockResponse(test.statusCode, test.in), nil)
+			if test.clientError {
+				mockClient.On("Do", mock.Anything).Return(nil, errors.New("Client error"))
+			} else {
+				mockClient.On("Do", mock.Anything).Return(mockResponse(test.statusCode, test.in), nil)
+			}
 
 			data, err := get("users")
 

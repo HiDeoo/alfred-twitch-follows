@@ -14,7 +14,13 @@ type MockClient struct {
 
 func (m *MockClient) Do(req *http.Request) (*http.Response, error) {
 	args := m.Called(req)
-	return args.Get(0).(*http.Response), args.Error(1)
+	arg0 := args.Get(0)
+
+	if arg0 != nil {
+		return args.Get(0).(*http.Response), args.Error(1)
+	}
+
+	return nil, args.Error(1)
 }
 
 func mockResponse(statusCode int, json string) *http.Response {
