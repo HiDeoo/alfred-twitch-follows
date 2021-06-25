@@ -7,7 +7,7 @@ import (
 )
 
 type Result struct {
-	Items interface{} `json:"items"`
+	Items []interface{} `json:"items"`
 }
 
 type Item struct {
@@ -22,7 +22,13 @@ type Error struct {
 }
 
 func SendResult(items []Item) {
-	send(Result{Items: items})
+	result := Result{Items: make([]interface{}, len(items))}
+
+	for i, item := range items {
+		result.Items[i] = item
+	}
+
+	send(result)
 }
 
 func SendError(err error) {
