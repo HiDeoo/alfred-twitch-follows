@@ -22,10 +22,16 @@ type Error struct {
 }
 
 func SendResult(items []Item) {
-	result := Result{Items: make([]interface{}, len(items))}
+	var result Result
 
-	for i, item := range items {
-		result.Items[i] = item
+	if len(items) > 0 {
+		result = Result{Items: make([]interface{}, len(items))}
+
+		for i, item := range items {
+			result.Items[i] = item
+		}
+	} else {
+		result = Result{Items: []interface{}{newEmptyPlaceholderItem()}}
 	}
 
 	send(result)
@@ -53,4 +59,11 @@ func send(data interface{}) {
 	}
 
 	log.Panicln(err)
+}
+
+func newEmptyPlaceholderItem() Item {
+	return Item{
+		Title:    "You're alone! ¯\\_(ツ)_/¯",
+		SubTitle: "Try browsing Twitch…",
+	}
 }

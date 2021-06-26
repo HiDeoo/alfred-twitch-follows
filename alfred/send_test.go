@@ -30,14 +30,22 @@ func TestSendResult(t *testing.T) {
 			assert.Nil(t, err)
 
 			if len(test.items) > 0 {
+				assert.Equal(t, len(test.items), len(result.Items))
+
 				for i, item := range test.items {
 					resultItem := result.Items[i].(map[string]interface{})
 
-					assert.Equal(t, resultItem["title"], item.Title)
-					assert.Equal(t, resultItem["subtitle"], item.SubTitle)
+					assert.Equal(t, item.Title, resultItem["title"])
+					assert.Equal(t, item.SubTitle, resultItem["subtitle"])
 				}
 			} else {
-				// TODO(HiDeoo)
+				assert.Equal(t, 1, len(result.Items))
+
+				item := result.Items[0].(map[string]interface{})
+				placeholder := newEmptyPlaceholderItem()
+
+				assert.Equal(t, placeholder.Title, item["title"])
+				assert.Equal(t, placeholder.SubTitle, item["subtitle"])
 			}
 		})
 	}
