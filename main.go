@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/HiDeoo/alfred-twitch-follows/alfred"
 	"github.com/HiDeoo/alfred-twitch-follows/twitch"
 )
@@ -19,9 +21,12 @@ func MapFollowsToItems(from []twitch.Follow) []alfred.Item {
 	items := make([]alfred.Item, len(from))
 
 	for i, follow := range from {
+		url := fmt.Sprintf("https://www.twitch.tv/%s", follow.ToLogin)
+
 		items[i] = alfred.Item{
 			Title:    follow.ToName,
-			SubTitle: "test",
+			SubTitle: url,
+			Arg:      url,
 		}
 	}
 

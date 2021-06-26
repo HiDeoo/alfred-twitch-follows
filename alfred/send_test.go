@@ -12,9 +12,35 @@ var sendResultTests = []struct {
 	name  string
 	items []Item
 }{
-	{"ReturnItems", []Item{{"title item 1", "subtitle item 1"}, {"title item 2", "subtitle item 2"}}},
-	{"ReturnItem", []Item{{"title single item", "subtitle single item"}}},
-	{"ReturnNoItems", []Item{}},
+	{
+		"ReturnItems",
+		[]Item{
+			{
+				"title item 1",
+				"subtitle item 1",
+				"arg item 1",
+			},
+			{
+				"title item 2",
+				"subtitle item 2",
+				"arg item 2",
+			},
+		},
+	},
+	{
+		"ReturnItem",
+		[]Item{
+			{
+				"title single item",
+				"subtitle single item",
+				"arg single item",
+			},
+		},
+	},
+	{
+		"ReturnNoItems",
+		[]Item{},
+	},
 }
 
 func TestSendResult(t *testing.T) {
@@ -37,6 +63,7 @@ func TestSendResult(t *testing.T) {
 
 					assert.Equal(t, item.Title, resultItem["title"])
 					assert.Equal(t, item.SubTitle, resultItem["subtitle"])
+					assert.Equal(t, item.Arg, resultItem["arg"])
 				}
 			} else {
 				assert.Equal(t, 1, len(result.Items))

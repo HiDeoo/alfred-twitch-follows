@@ -13,6 +13,7 @@ type Result struct {
 type Item struct {
 	Title    string `json:"title"`
 	SubTitle string `json:"subtitle"`
+	Arg      string `json:"arg"`
 }
 
 type Error struct {
