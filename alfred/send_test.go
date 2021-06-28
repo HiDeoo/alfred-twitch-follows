@@ -8,43 +8,43 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var sendResultTests = []struct {
-	name  string
-	items []Item
-}{
-	{
-		"ReturnItems",
-		[]Item{
-			{
-				"title item 1",
-				"subtitle item 1",
-				"arg item 1",
-			},
-			{
-				"title item 2",
-				"subtitle item 2",
-				"arg item 2",
-			},
-		},
-	},
-	{
-		"ReturnItem",
-		[]Item{
-			{
-				"title single item",
-				"subtitle single item",
-				"arg single item",
-			},
-		},
-	},
-	{
-		"ReturnNoItems",
-		[]Item{},
-	},
-}
-
 func TestSendResult(t *testing.T) {
-	for _, test := range sendResultTests {
+	tests := []struct {
+		name  string
+		items []Item
+	}{
+		{
+			"ReturnItems",
+			[]Item{
+				{
+					"title item 1",
+					"subtitle item 1",
+					"arg item 1",
+				},
+				{
+					"title item 2",
+					"subtitle item 2",
+					"arg item 2",
+				},
+			},
+		},
+		{
+			"ReturnItem",
+			[]Item{
+				{
+					"title single item",
+					"subtitle single item",
+					"arg single item",
+				},
+			},
+		},
+		{
+			"ReturnNoItems",
+			[]Item{},
+		},
+	}
+
+	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			output := captureOutput(func() {
 				SendResult(test.items)

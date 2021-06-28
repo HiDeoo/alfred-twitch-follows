@@ -8,17 +8,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var mapFollowsToItemsTests = []struct {
-	name        string
-	followCount int
-}{
-	{"ReturnNoFollows", 0},
-	{"ReturnMultipleFollows", 1},
-	{"ReturnMultipleFollows", 2},
-}
-
 func TestMapFollowsToItems(t *testing.T) {
-	for _, test := range mapFollowsToItemsTests {
+	tests := []struct {
+		name        string
+		followCount int
+	}{
+		{"ReturnNoFollows", 0},
+		{"ReturnMultipleFollows", 1},
+		{"ReturnMultipleFollows", 2},
+	}
+
+	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			var follows = []twitch.Follow{}
 

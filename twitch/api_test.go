@@ -24,22 +24,15 @@ const userJson = `{
 	]
 }`
 
-var getFollowsTests = []ApiTest{
-	{"ReturnNoFollows", 0, 1, userJson, true},
-	{"ReturnFollows", 2, 1, userJson, true},
-	{"ReturnFollowsWithPagination", 2, 2, userJson, true},
-	{"ReturnError", 2, 1, `{ "data": [] }`, false},
-}
-
-var getFollowedStreamsTests = []ApiTest{
-	{"ReturnNoFollowedStreams", 0, 1, userJson, true},
-	{"ReturnFollowedStreams", 2, 1, userJson, true},
-	{"ReturnFollowedStreamsWithPagination", 2, 2, userJson, true},
-	{"ReturnError", 2, 1, `{ "data": [] }`, false},
-}
-
 func TestGetFollows(t *testing.T) {
-	for _, test := range getFollowsTests {
+	tests := []ApiTest{
+		{"ReturnNoFollows", 0, 1, userJson, true},
+		{"ReturnFollows", 2, 1, userJson, true},
+		{"ReturnFollowsWithPagination", 2, 2, userJson, true},
+		{"ReturnError", 2, 1, `{ "data": [] }`, false},
+	}
+
+	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			testAPI(t, test, func(index int) interface{} {
 				return Follow{
@@ -58,7 +51,14 @@ func TestGetFollows(t *testing.T) {
 }
 
 func TestGetFollowedStreams(t *testing.T) {
-	for _, test := range getFollowedStreamsTests {
+	tests := []ApiTest{
+		{"ReturnNoFollowedStreams", 0, 1, userJson, true},
+		{"ReturnFollowedStreams", 2, 1, userJson, true},
+		{"ReturnFollowedStreamsWithPagination", 2, 2, userJson, true},
+		{"ReturnError", 2, 1, `{ "data": [] }`, false},
+	}
+
+	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			testAPI(t, test, func(index int) interface{} {
 				return Stream{
