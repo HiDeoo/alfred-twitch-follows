@@ -12,6 +12,8 @@ func main() {
 
 	if err != nil {
 		alfred.SendError(err)
+
+		return
 	}
 
 	alfred.SendResult(mapFollowsToItems(follows))
