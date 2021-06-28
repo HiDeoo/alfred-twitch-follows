@@ -14,10 +14,10 @@ func main() {
 		alfred.SendError(err)
 	}
 
-	alfred.SendResult(MapFollowsToItems(follows))
+	alfred.SendResult(mapFollowsToItems(follows))
 }
 
-func MapFollowsToItems(from []twitch.Follow) []alfred.Item {
+func mapFollowsToItems(from []twitch.Follow) []alfred.Item {
 	items := make([]alfred.Item, len(from))
 
 	for i, follow := range from {
