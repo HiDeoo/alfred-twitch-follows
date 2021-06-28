@@ -36,6 +36,35 @@ func GetFollows() ([]Follow, error) {
 	return allFollows, nil
 }
 
+func GetFollowedStreams() ([]Stream, error) {
+	currentUser, err := getCurrentUser()
+
+	if err != nil {
+		return nil, err
+	}
+
+	var cursor = ""
+	var allStreams []Stream
+
+	for {
+		streams, err := getFollowedStreamsWithPagination(currentUser.Id, cursor)
+
+		if err != nil {
+			return nil, err
+		}
+
+		allStreams = append(allStreams, streams.Data...)
+
+		if len(streams.Pagination.Cursor) == 0 {
+			break
+		}
+
+		cursor = streams.Pagination.Cursor
+	}
+
+	return allStreams, nil
+}
+
 func getFollowsWithPagination(userID string, cursor string) (*Follows, error) {
 	data, err := get(
 		"users/follows",
@@ -55,6 +84,27 @@ func getFollowsWithPagination(userID string, cursor string) (*Follows, error) {
 	}
 
 	return &follows, nil
+}
+
+func getFollowedStreamsWithPagination(userID string, cursor string) (*Streams, error) {
+	data, err := get(
+		"streams/followed",
+		&QueryParam{"user_id", userID},
+		&QueryParam{"first", "100"},
+		&QueryParam{"after", cursor},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	streams := Streams{}
+
+	if err = json.Unmarshal(data, &streams); err != nil {
+		return nil, err
+	}
+
+	return &streams, nil
 }
 
 func getCurrentUser() (*User, error) {

@@ -1,12 +1,9 @@
 package twitch
 
 import (
-	"encoding/json"
 	"fmt"
+	"strconv"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 const userJson = `{
@@ -27,83 +24,62 @@ const userJson = `{
 	]
 }`
 
-var getFollowsTests = []struct {
-	name        string
-	followCount int
-	pageCount   int
-	user        string
-	success     bool
-}{
+var getFollowsTests = []ApiTest{
 	{"ReturnNoFollows", 0, 1, userJson, true},
 	{"ReturnFollows", 2, 1, userJson, true},
 	{"ReturnFollowsWithPagination", 2, 2, userJson, true},
 	{"ReturnError", 2, 1, `{ "data": [] }`, false},
 }
 
+var getFollowedStreamsTests = []ApiTest{
+	{"ReturnNoFollowedStreams", 0, 1, userJson, true},
+	{"ReturnFollowedStreams", 2, 1, userJson, true},
+	{"ReturnFollowedStreamsWithPagination", 2, 2, userJson, true},
+	{"ReturnError", 2, 1, `{ "data": [] }`, false},
+}
+
 func TestGetFollows(t *testing.T) {
 	for _, test := range getFollowsTests {
 		t.Run(test.name, func(t *testing.T) {
-			mockClient := new(MockClient)
-			Client = mockClient
-			mockClient.On("Do", mock.Anything).Return(mockResponse(200, test.user), nil).Once()
-
-			var cursor string
-			followIndex := 0
-			followsPerPage := make([][]Follow, test.pageCount)
-
-			for i := 0; i < test.pageCount; i++ {
-				followsPerPage[i] = []Follow{}
-
-				for j := 0; j < test.followCount; j++ {
-					followJson := Follow{
-						FromId:     "123456789",
-						FromLogin:  "user",
-						ToId:       fmt.Sprintf("1234560%d", followIndex),
-						ToLogin:    fmt.Sprintf("user%d", followIndex),
-						ToName:     fmt.Sprintf("User%d", followIndex),
-						FollowedAt: fmt.Sprintf("2020-03-01T02:23:4%d.009756Z", followIndex),
-					}
-
-					followsPerPage[i] = append(followsPerPage[i], followJson)
-					followIndex++
+			testAPI(t, test, func(index int) interface{} {
+				return Follow{
+					FromId:     "123456789",
+					FromLogin:  "user",
+					ToId:       fmt.Sprintf("1234560%d", index),
+					ToLogin:    fmt.Sprintf("user%d", index),
+					ToName:     fmt.Sprintf("User%d", index),
+					FollowedAt: fmt.Sprintf("2020-03-01T02:23:4%d.009756Z", index),
 				}
+			}, func() (interface{}, error) {
+				return GetFollows()
+			})
+		})
+	}
+}
 
-				pageFollowsJson, err := json.Marshal(followsPerPage[i])
-				assert.Nil(t, err)
-
-				if test.pageCount > 1 && i != test.pageCount-1 {
-					cursor = "abcdefgh"
-				} else {
-					cursor = ""
+func TestGetFollowedStreams(t *testing.T) {
+	for _, test := range getFollowedStreamsTests {
+		t.Run(test.name, func(t *testing.T) {
+			testAPI(t, test, func(index int) interface{} {
+				return Stream{
+					Id:           strconv.Itoa(index),
+					UserId:       fmt.Sprintf("1234560%d", index),
+					UserLogin:    fmt.Sprintf("user%d", index),
+					UserName:     fmt.Sprintf("User%d", index),
+					GameId:       fmt.Sprintf("game%d", index),
+					GameName:     fmt.Sprintf("Game%d", index),
+					Type:         "live",
+					Title:        fmt.Sprintf("Stream Title %d", index),
+					ViewerCount:  index * 100,
+					StartedAt:    fmt.Sprintf("2020-02-01T02:23:4%d.009756Z", index),
+					Language:     "en",
+					ThumbnailUrl: fmt.Sprintf("https://twitch.tv/stream/%d/thumbnail.png", index),
+					TagIds:       []string{"1122334455"},
+					IsMature:     false,
 				}
-
-				json := fmt.Sprintf(
-					`{ "total": %d, "data": %s, "pagination": { "cursor": "%s" } }`,
-					len(followsPerPage[i]),
-					pageFollowsJson,
-					cursor,
-				)
-
-				mockClient.On("Do", mock.Anything).Return(mockResponse(200, json), nil).Once()
-			}
-
-			follows, err := GetFollows()
-
-			if test.success {
-				assert.Equal(t, test.followCount*test.pageCount, len(follows))
-				assert.Nil(t, err)
-
-				expectedFollows := []Follow{}
-
-				for _, pageFollows := range followsPerPage {
-					expectedFollows = append(expectedFollows, pageFollows...)
-				}
-
-				assert.ElementsMatch(t, expectedFollows, follows)
-			} else {
-				assert.Nil(t, follows)
-				assert.NotNil(t, err)
-			}
+			}, func() (interface{}, error) {
+				return GetFollowedStreams()
+			})
 		})
 	}
 }
