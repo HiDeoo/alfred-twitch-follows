@@ -22,7 +22,12 @@ type Item struct {
 
 type EmptyItem struct {
 	Item
-	Mods Modifiers `json:"mods"`
+	Icon EmptyItemIcon `json:"icon"`
+	Mods Modifiers     `json:"mods"`
+}
+
+type EmptyItemIcon struct {
+	Path string `json:"path"`
 }
 
 type Modifiers struct {
@@ -37,7 +42,8 @@ type Modifier struct {
 
 type Error struct {
 	BaseItem
-	Valid bool `json:"valid"`
+	Valid bool          `json:"valid"`
+	Icon  EmptyItemIcon `json:"icon"`
 }
 
 func SendResult(items []Item) {
@@ -62,6 +68,7 @@ func SendError(err error) {
 			Error{
 				BaseItem: BaseItem{"Something went wrong!", err.Error()},
 				Valid:    false,
+				Icon:     EmptyItemIcon{"images/error.png"},
 			},
 		},
 	})
@@ -85,6 +92,7 @@ func newEmptyPlaceholderItem() EmptyItem {
 			BaseItem: BaseItem{"You're alone! ¯\\_(ツ)_/¯", "Try browsing Twitch…"},
 			Arg:      "https://www.twitch.tv/directory/following",
 		},
+		Icon: EmptyItemIcon{"images/error.png"},
 		Mods: Modifiers{
 			Alt:   Modifier{false},
 			Cmd:   Modifier{false},
