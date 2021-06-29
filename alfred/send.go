@@ -10,16 +10,34 @@ type Result struct {
 	Items []interface{} `json:"items"`
 }
 
-type Item struct {
+type BaseItem struct {
 	Title    string `json:"title"`
 	SubTitle string `json:"subtitle"`
-	Arg      string `json:"arg"`
+}
+
+type Item struct {
+	BaseItem
+	Arg string `json:"arg"`
+}
+
+type EmptyItem struct {
+	Item
+	Mods Modifiers `json:"mods"`
+}
+
+type Modifiers struct {
+	Alt   Modifier `json:"alt"`
+	Cmd   Modifier `json:"cmd"`
+	Shift Modifier `json:"shift"`
+}
+
+type Modifier struct {
+	Valid bool `json:"valid"`
 }
 
 type Error struct {
-	Title    string `json:"title"`
-	SubTitle string `json:"subtitle"`
-	Valid    bool   `json:"valid"`
+	BaseItem
+	Valid bool `json:"valid"`
 }
 
 func SendResult(items []Item) {
@@ -42,8 +60,7 @@ func SendError(err error) {
 	send(Result{
 		Items: []interface{}{
 			Error{
-				Title:    "Something went wrong!",
-				SubTitle: err.Error(),
+				BaseItem: BaseItem{"Something went wrong!", err.Error()},
 				Valid:    false,
 			},
 		},
@@ -62,10 +79,16 @@ func send(data interface{}) {
 	log.Panicln(err)
 }
 
-func newEmptyPlaceholderItem() Item {
-	return Item{
-		Title:    "You're alone! ¯\\_(ツ)_/¯",
-		SubTitle: "Try browsing Twitch…",
-		Arg:      "https://www.twitch.tv/directory/following",
+func newEmptyPlaceholderItem() EmptyItem {
+	return EmptyItem{
+		Item: Item{
+			BaseItem: BaseItem{"You're alone! ¯\\_(ツ)_/¯", "Try browsing Twitch…"},
+			Arg:      "https://www.twitch.tv/directory/following",
+		},
+		Mods: Modifiers{
+			Alt:   Modifier{false},
+			Cmd:   Modifier{false},
+			Shift: Modifier{false},
+		},
 	}
 }

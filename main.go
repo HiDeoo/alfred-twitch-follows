@@ -43,9 +43,11 @@ func getFollowItems(getter func() ([]twitch.Follow, error)) ([]alfred.Item, erro
 		url := fmt.Sprintf("https://www.twitch.tv/%s", follow.ToLogin)
 
 		items[i] = alfred.Item{
-			Title:    follow.ToName,
-			SubTitle: url,
-			Arg:      url,
+			BaseItem: alfred.BaseItem{
+				Title:    follow.ToName,
+				SubTitle: url,
+			},
+			Arg: url,
 		}
 	}
 
@@ -63,9 +65,11 @@ func getFollowedStreamItems(getter func() ([]twitch.Stream, error)) ([]alfred.It
 
 	for i, stream := range streams {
 		items[i] = alfred.Item{
-			Title:    stream.UserName,
-			SubTitle: fmt.Sprintf("%s - %d viewers - %s", stream.GameName, stream.ViewerCount, stream.Title),
-			Arg:      fmt.Sprintf("https://www.twitch.tv/%s", stream.UserLogin),
+			BaseItem: alfred.BaseItem{
+				Title:    stream.UserName,
+				SubTitle: fmt.Sprintf("%s - %d viewers - %s", stream.GameName, stream.ViewerCount, stream.Title),
+			},
+			Arg: fmt.Sprintf("https://www.twitch.tv/%s", stream.UserLogin),
 		}
 	}
 

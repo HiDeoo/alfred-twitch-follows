@@ -17,13 +17,11 @@ func TestSendResult(t *testing.T) {
 			"ReturnItems",
 			[]Item{
 				{
-					"title item 1",
-					"subtitle item 1",
+					BaseItem{"title item 1", "subtitle item 1"},
 					"arg item 1",
 				},
 				{
-					"title item 2",
-					"subtitle item 2",
+					BaseItem{"title item 2", "subtitle item 2"},
 					"arg item 2",
 				},
 			},
@@ -32,8 +30,7 @@ func TestSendResult(t *testing.T) {
 			"ReturnItem",
 			[]Item{
 				{
-					"title single item",
-					"subtitle single item",
+					BaseItem{"title single item", "subtitle single item"},
 					"arg single item",
 				},
 			},
