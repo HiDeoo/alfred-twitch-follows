@@ -66,5 +66,6 @@ func newEmptyPlaceholderItem() Item {
 	return Item{
 		Title:    "You're alone! ¯\\_(ツ)_/¯",
 		SubTitle: "Try browsing Twitch…",
+		Arg:      "https://www.twitch.tv/directory/following",
 	}
 }

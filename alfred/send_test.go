@@ -73,6 +73,7 @@ func TestSendResult(t *testing.T) {
 
 				assert.Equal(t, placeholder.Title, item["title"])
 				assert.Equal(t, placeholder.SubTitle, item["subtitle"])
+				assert.Equal(t, placeholder.Arg, item["arg"])
 			}
 		})
 	}
