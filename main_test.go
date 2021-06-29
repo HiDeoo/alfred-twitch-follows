@@ -36,7 +36,9 @@ func TestMapFollowsToItems(t *testing.T) {
 				follows = append(follows, followJSON)
 			}
 
-			items := mapFollowsToItems(follows)
+			items, _ := getFollowItems(func() ([]twitch.Follow, error) {
+				return follows, nil
+			})
 
 			assert.Equal(t, test.followCount, len(items))
 
@@ -51,8 +53,8 @@ func TestMapFollowsToItems(t *testing.T) {
 
 func TestMapFollowedStreamsToItems(t *testing.T) {
 	tests := []struct {
-		name        string
-		followCount int
+		name                 string
+		followedStreamsCount int
 	}{
 		{"ReturnNoFollowedStreams", 0},
 		{"ReturnSingleFollowedStream", 1},
@@ -63,7 +65,7 @@ func TestMapFollowedStreamsToItems(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			var streams = []twitch.Stream{}
 
-			for i := 0; i < test.followCount; i++ {
+			for i := 0; i < test.followedStreamsCount; i++ {
 				streamJSON := twitch.Stream{
 					Id:           strconv.Itoa(i),
 					UserId:       fmt.Sprintf("1234560%d", i),
@@ -84,9 +86,11 @@ func TestMapFollowedStreamsToItems(t *testing.T) {
 				streams = append(streams, streamJSON)
 			}
 
-			items := mapStreamsToItems(streams)
+			items, _ := getFollowedStreamItems(func() ([]twitch.Stream, error) {
+				return streams, nil
+			})
 
-			assert.Equal(t, test.followCount, len(items))
+			assert.Equal(t, test.followedStreamsCount, len(items))
 
 			for i, item := range items {
 				assert.Equal(t, streams[i].UserName, item.Title)

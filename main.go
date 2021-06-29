@@ -16,9 +16,9 @@ func main() {
 	var err error
 
 	if *returnLiveFollows {
-		items, err = getFollowedStreamItems()
+		items, err = getFollowedStreamItems(twitch.GetFollowedStreams)
 	} else {
-		items, err = getFollowItems()
+		items, err = getFollowItems(twitch.GetFollows)
 	}
 
 	if err != nil {
@@ -30,27 +30,13 @@ func main() {
 	alfred.SendResult(items)
 }
 
-func getFollowItems() ([]alfred.Item, error) {
-	follows, err := twitch.GetFollows()
+func getFollowItems(getter func() ([]twitch.Follow, error)) ([]alfred.Item, error) {
+	follows, err := getter()
 
 	if err != nil {
 		return nil, err
 	}
 
-	return mapFollowsToItems(follows), nil
-}
-
-func getFollowedStreamItems() ([]alfred.Item, error) {
-	streams, err := twitch.GetFollowedStreams()
-
-	if err != nil {
-		return nil, err
-	}
-
-	return mapStreamsToItems(streams), nil
-}
-
-func mapFollowsToItems(follows []twitch.Follow) []alfred.Item {
 	items := make([]alfred.Item, len(follows))
 
 	for i, follow := range follows {
@@ -63,10 +49,16 @@ func mapFollowsToItems(follows []twitch.Follow) []alfred.Item {
 		}
 	}
 
-	return items
+	return items, nil
 }
 
-func mapStreamsToItems(streams []twitch.Stream) []alfred.Item {
+func getFollowedStreamItems(getter func() ([]twitch.Stream, error)) ([]alfred.Item, error) {
+	streams, err := getter()
+
+	if err != nil {
+		return nil, err
+	}
+
 	items := make([]alfred.Item, len(streams))
 
 	for i, stream := range streams {
@@ -77,5 +69,5 @@ func mapStreamsToItems(streams []twitch.Stream) []alfred.Item {
 		}
 	}
 
-	return items
+	return items, nil
 }
