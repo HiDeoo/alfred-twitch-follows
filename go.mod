@@ -1,4 +1,4 @@
-module github.com/HiDeoo/alfred-workflow-binaries
+module github.com/HiDeoo/alfred-workflow-tools
 
 go 1.16
 

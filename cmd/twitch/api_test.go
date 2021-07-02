@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/HiDeoo/alfred-workflow-binaries/pkg/request"
+	"github.com/HiDeoo/alfred-workflow-tools/pkg/request"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

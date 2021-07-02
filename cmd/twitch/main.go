@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/HiDeoo/alfred-workflow-binaries/pkg/alfred"
+	"github.com/HiDeoo/alfred-workflow-tools/pkg/alfred"
 )
 
 func main() {

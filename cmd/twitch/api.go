@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/HiDeoo/alfred-workflow-binaries/pkg/request"
+	"github.com/HiDeoo/alfred-workflow-tools/pkg/request"
 )
 
 var client request.Client
