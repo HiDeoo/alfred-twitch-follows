@@ -1,12 +1,12 @@
-package twitch
+package main
 
-type Follows struct {
-	Total      int        `json:"total"`
-	Data       []Follow   `json:"data"`
-	Pagination Pagination `json:"pagination"`
+type TwitchFollows struct {
+	Total      int              `json:"total"`
+	Data       []TwitchFollow   `json:"data"`
+	Pagination TwitchPagination `json:"pagination"`
 }
 
-type Follow struct {
+type TwitchFollow struct {
 	FromId     string `json:"from_id"`
 	FromLogin  string `json:"from_login"`
 	ToId       string `json:"to_id"`
@@ -15,12 +15,12 @@ type Follow struct {
 	FollowedAt string `json:"followed_at"`
 }
 
-type Streams struct {
-	Data       []Stream   `json:"data"`
-	Pagination Pagination `json:"pagination"`
+type TwitchStreams struct {
+	Data       []TwitchStream   `json:"data"`
+	Pagination TwitchPagination `json:"pagination"`
 }
 
-type Stream struct {
+type TwitchStream struct {
 	Id           string   `json:"id"`
 	UserId       string   `json:"user_id"`
 	UserLogin    string   `json:"user_login"`
@@ -37,11 +37,11 @@ type Stream struct {
 	IsMature     bool     `json:"is_mature"`
 }
 
-type Users struct {
-	Data []User `json:"data"`
+type TwitchUsers struct {
+	Data []TwitchUser `json:"data"`
 }
 
-type User struct {
+type TwitchUser struct {
 	Id              string `json:"id"`
 	Login           string `json:"login"`
 	DisplayName     string `json:"display_name"`
@@ -54,12 +54,12 @@ type User struct {
 	CreatedAt       string `json:"created_at"`
 }
 
-type Error struct {
+type TwitchError struct {
 	Error   string `json:"error"`
 	Status  int    `json:"status"`
 	Message string `json:"message"`
 }
 
-type Pagination struct {
+type TwitchPagination struct {
 	Cursor string `json:"cursor"`
 }

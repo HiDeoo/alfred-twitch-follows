@@ -5,7 +5,6 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/HiDeoo/alfred-twitch-follows/twitch"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,10 +20,10 @@ func TestMapFollowsToItems(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			var follows = []twitch.Follow{}
+			var follows = []TwitchFollow{}
 
 			for i := 0; i < test.followCount; i++ {
-				followJSON := twitch.Follow{
+				followJSON := TwitchFollow{
 					FromId:     "123456789",
 					FromLogin:  "user",
 					ToId:       fmt.Sprintf("1234560%d", i),
@@ -36,7 +35,7 @@ func TestMapFollowsToItems(t *testing.T) {
 				follows = append(follows, followJSON)
 			}
 
-			items, _ := getFollowItems(func() ([]twitch.Follow, error) {
+			items, _ := getFollowItems(func() ([]TwitchFollow, error) {
 				return follows, nil
 			})
 
@@ -63,10 +62,10 @@ func TestMapFollowedStreamsToItems(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			var streams = []twitch.Stream{}
+			var streams = []TwitchStream{}
 
 			for i := 0; i < test.followedStreamsCount; i++ {
-				streamJSON := twitch.Stream{
+				streamJSON := TwitchStream{
 					Id:           strconv.Itoa(i),
 					UserId:       fmt.Sprintf("1234560%d", i),
 					UserLogin:    fmt.Sprintf("user%d", i),
@@ -86,7 +85,7 @@ func TestMapFollowedStreamsToItems(t *testing.T) {
 				streams = append(streams, streamJSON)
 			}
 
-			items, _ := getFollowedStreamItems(func() ([]twitch.Stream, error) {
+			items, _ := getFollowedStreamItems(func() ([]TwitchStream, error) {
 				return streams, nil
 			})
 

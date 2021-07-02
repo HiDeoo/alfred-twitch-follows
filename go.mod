@@ -1,4 +1,4 @@
-module github.com/HiDeoo/alfred-twitch-follows
+module github.com/HiDeoo/alfred-workflow-binaries
 
 go 1.16
 

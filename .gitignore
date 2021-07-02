@@ -1,2 +1,3 @@
-/follows
 *.out
+.DS_Store
+/twitch

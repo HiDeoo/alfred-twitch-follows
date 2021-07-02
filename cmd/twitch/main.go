@@ -4,8 +4,7 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/HiDeoo/alfred-twitch-follows/alfred"
-	"github.com/HiDeoo/alfred-twitch-follows/twitch"
+	"github.com/HiDeoo/alfred-workflow-binaries/pkg/alfred"
 )
 
 func main() {
@@ -16,9 +15,9 @@ func main() {
 	var err error
 
 	if *returnLiveFollows {
-		items, err = getFollowedStreamItems(twitch.GetFollowedStreams)
+		items, err = getFollowedStreamItems(GetFollowedStreams)
 	} else {
-		items, err = getFollowItems(twitch.GetFollows)
+		items, err = getFollowItems(GetFollows)
 	}
 
 	if err != nil {
@@ -30,7 +29,7 @@ func main() {
 	alfred.SendResult(items)
 }
 
-func getFollowItems(getter func() ([]twitch.Follow, error)) ([]alfred.Item, error) {
+func getFollowItems(getter func() ([]TwitchFollow, error)) ([]alfred.Item, error) {
 	follows, err := getter()
 
 	if err != nil {
@@ -54,7 +53,7 @@ func getFollowItems(getter func() ([]twitch.Follow, error)) ([]alfred.Item, erro
 	return items, nil
 }
 
-func getFollowedStreamItems(getter func() ([]twitch.Stream, error)) ([]alfred.Item, error) {
+func getFollowedStreamItems(getter func() ([]TwitchStream, error)) ([]alfred.Item, error) {
 	streams, err := getter()
 
 	if err != nil {
