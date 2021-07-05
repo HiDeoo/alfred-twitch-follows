@@ -34,7 +34,7 @@ func getUnwatchedShowItems(getter func() ([]BSShow, error)) ([]alfred.Item, erro
 				Title:    show.Title,
 				SubTitle: fmt.Sprintf("%d episodes remaining (%s total)", show.User.Remaining, show.Episodes),
 			},
-			Arg: strconv.Itoa(show.User.Next.ID),
+			Arg: strconv.Itoa(show.ID),
 		}
 	}
 

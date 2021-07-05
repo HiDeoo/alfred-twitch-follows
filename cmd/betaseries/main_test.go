@@ -45,7 +45,7 @@ func TestGetUnwatchedShowItems(t *testing.T) {
 					fmt.Sprintf("%d episodes remaining (%s total)", shows[i].User.Remaining, shows[i].Episodes),
 					item.SubTitle,
 				)
-				assert.Equal(t, strconv.Itoa(shows[i].User.Next.ID), item.Arg)
+				assert.Equal(t, strconv.Itoa(shows[i].ID), item.Arg)
 			}
 		})
 	}
