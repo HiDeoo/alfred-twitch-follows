@@ -66,24 +66,9 @@ type BSShow struct {
 		Type       string `json:"type"`
 		ExternalID string `json:"external_id"`
 	} `json:"social_links"`
-	User struct {
-		Archived  bool    `json:"archived"`
-		Favorited bool    `json:"favorited"`
-		Remaining int     `json:"remaining"`
-		Status    float64 `json:"status"`
-		Last      string  `json:"last"`
-		Tags      string  `json:"tags"`
-		Next      struct {
-			ID    int    `json:"id"`
-			Code  string `json:"code"`
-			Date  string `json:"date"`
-			Title string `json:"title"`
-			Image string `json:"image"`
-		} `json:"next"`
-		FriendsWatching []interface{} `json:"friends_watching"`
-	} `json:"user"`
-	NextTrailer string `json:"next_trailer"`
-	ResourceURL string `json:"resource_url"`
+	User        BSShowUser `json:"user"`
+	NextTrailer string     `json:"next_trailer"`
+	ResourceURL string     `json:"resource_url"`
 	Platforms   struct {
 		Svods []struct {
 			ID        string      `json:"id"`
@@ -108,6 +93,25 @@ type BSShow struct {
 			Logo string `json:"logo"`
 		} `json:"svod"`
 	} `json:"platforms"`
+}
+
+type BSShowUser struct {
+	Archived        bool           `json:"archived"`
+	Favorited       bool           `json:"favorited"`
+	Remaining       int            `json:"remaining"`
+	Status          float64        `json:"status"`
+	Last            string         `json:"last"`
+	Tags            string         `json:"tags"`
+	Next            BSShowUserNext `json:"next"`
+	FriendsWatching []interface{}  `json:"friends_watching"`
+}
+
+type BSShowUserNext struct {
+	ID    int    `json:"id"`
+	Code  string `json:"code"`
+	Date  string `json:"date"`
+	Title string `json:"title"`
+	Image string `json:"image"`
 }
 
 type BSErrors struct {

@@ -24,7 +24,9 @@ func TestGetUnwatchedShowItems(t *testing.T) {
 
 			for i := 0; i < test.showCount; i++ {
 				showJSON := BSShow{
+					ID:    123456789 + i,
 					Title: fmt.Sprintf("Title %d", i),
+					User:  BSShowUser{Next: BSShowUserNext{ID: 987654321 + 0}},
 				}
 
 				shows = append(shows, showJSON)
@@ -43,7 +45,7 @@ func TestGetUnwatchedShowItems(t *testing.T) {
 					fmt.Sprintf("%d episodes remaining (%s total)", shows[i].User.Remaining, shows[i].Episodes),
 					item.SubTitle,
 				)
-				assert.Equal(t, strconv.Itoa(shows[i].ID), item.Arg)
+				assert.Equal(t, strconv.Itoa(shows[i].User.Next.ID), item.Arg)
 			}
 		})
 	}
