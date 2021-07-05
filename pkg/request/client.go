@@ -35,7 +35,15 @@ func (client *Client) SetClient(httpClient httpClient) {
 }
 
 func (client *Client) Get(path string, queryParams url.Values) (*Response, error) {
-	req, err := http.NewRequest(http.MethodGet, client.baseURL+path+"?"+queryParams.Encode(), nil)
+	return client.request(http.MethodGet, path, queryParams)
+}
+
+func (client *Client) Post(path string, queryParams url.Values) (*Response, error) {
+	return client.request(http.MethodPost, path, queryParams)
+}
+
+func (client *Client) request(method, path string, queryParams url.Values) (*Response, error) {
+	req, err := http.NewRequest(method, client.baseURL+path+"?"+queryParams.Encode(), nil)
 
 	if err != nil {
 		return nil, err
