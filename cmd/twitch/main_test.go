@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestMapFollowsToItems(t *testing.T) {
+func TestGetFollowItems(t *testing.T) {
 	tests := []struct {
 		name        string
 		followCount int
@@ -50,7 +50,7 @@ func TestMapFollowsToItems(t *testing.T) {
 	}
 }
 
-func TestMapFollowedStreamsToItems(t *testing.T) {
+func TestGetFollowedStreamItems(t *testing.T) {
 	tests := []struct {
 		name                 string
 		followedStreamsCount int
