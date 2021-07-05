@@ -1,6 +1,8 @@
 package main
 
 import (
+	"flag"
+
 	"fmt"
 	"strconv"
 
@@ -8,7 +10,19 @@ import (
 )
 
 func main() {
-	items, err := getUnwatchedShowItems(getCurrentShowsWithUnwatchedEpisodes)
+	showID := flag.String("watched", "", "mark all episodes of a show as watched")
+	flag.Parse()
+
+	shouldMarkShowAsWatched := *showID != ""
+
+	var items []alfred.Item
+	var err error
+
+	if shouldMarkShowAsWatched {
+		err = markShowAsWatched(*showID)
+	} else {
+		items, err = getUnwatchedShowItems(getCurrentShowsWithUnwatchedEpisodes)
+	}
 
 	if err != nil {
 		alfred.SendError(err)
@@ -16,7 +30,9 @@ func main() {
 		return
 	}
 
-	alfred.SendResult(items)
+	if !shouldMarkShowAsWatched {
+		alfred.SendResult(items)
+	}
 }
 
 func getUnwatchedShowItems(getter func() ([]BSShow, error)) ([]alfred.Item, error) {
