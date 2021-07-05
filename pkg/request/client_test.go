@@ -42,6 +42,10 @@ func TestGet(t *testing.T) {
 					MockResponse(test.statusCode, test.response),
 					nil,
 					func(req *http.Request) {
+
+						assert.Equal(t, "example.com", req.URL.Host)
+						assert.Equal(t, "/fake", req.URL.Path)
+
 						if len(test.queryParams) > 0 {
 							queryParams := req.URL.Query()
 
