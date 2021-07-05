@@ -41,6 +41,51 @@ func TestGetCurrentShowsWithUnwatchedEpisodes(t *testing.T) {
 	}
 }
 
+func TestGetLastAiredEpisode(t *testing.T) {
+	tests := []struct {
+		name             string
+		lastEpisodeIndex int
+		episodeDates     []string
+	}{
+		{"ReturnLastEpisodeAtLastIndex", 1, []string{"2020-10-22", "2020-11-22"}},
+		{"ReturnLastEpisodeNotAtLastIndex", 2, []string{"2020-10-22", "2020-11-22", "2020-12-22", "2025-11-22"}},
+		{"ReturnNoLastEpisode", -1, []string{"2025-10-22", "2025-11-22"}},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			mockClient := new(request.MockClient)
+			client.SetClient(mockClient)
+
+			episodes := make([]BSEpisode, len(test.episodeDates))
+
+			for i, date := range test.episodeDates {
+				episodes[i] = BSEpisode{
+					Date: date,
+				}
+			}
+
+			episodesJSON, err := json.Marshal(episodes)
+			assert.Nil(t, err)
+
+			mockClient.On("Do", mock.Anything).Return(request.MockResponse(
+				200,
+				fmt.Sprintf(`{ "episodes": %s }`, episodesJSON),
+			), nil).Once()
+
+			lastEpisode, err := getLastAiredEpisode("123")
+
+			if test.lastEpisodeIndex != -1 {
+				assert.Nil(t, err)
+				assert.Equal(t, test.episodeDates[test.lastEpisodeIndex], lastEpisode.Date)
+			} else {
+				assert.NotNil(t, err)
+				assert.Nil(t, lastEpisode)
+			}
+		})
+	}
+}
+
 func TestQuery(t *testing.T) {
 	var errStr = "Something went wrong!"
 

@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/HiDeoo/alfred-workflow-tools/pkg/request"
 )
@@ -49,6 +50,20 @@ func getCurrentShowsWithUnwatchedEpisodes() ([]BSShow, error) {
 	return allShows, nil
 }
 
+func markShowAsWatched(showID string) error {
+	lastAiredEpisode, err := getLastAiredEpisode(showID)
+
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("> %v\n", lastAiredEpisode.Title)
+
+	// TODO(HiDeoo) Mark this episode (and all following) as watched
+
+	return nil
+}
+
 func getCurrentShowsWithUnwatchedEpisodesAndPagination(offset int) (*BSShows, error) {
 	queryParams := url.Values{}
 	queryParams.Set("status", "current")
@@ -68,6 +83,46 @@ func getCurrentShowsWithUnwatchedEpisodesAndPagination(offset int) (*BSShows, er
 	}
 
 	return &shows, nil
+}
+
+func getLastAiredEpisode(showID string) (*BSEpisode, error) {
+	queryParams := url.Values{}
+	queryParams.Set("id", showID)
+
+	res, err := query(client.Get("shows/episodes", queryParams))
+
+	if err != nil {
+		return nil, err
+	}
+
+	episodes := BSEpisodes{}
+	var lastAiredEpisode *BSEpisode
+
+	if err = json.Unmarshal(res.Data, &episodes); err != nil {
+		return nil, err
+	}
+
+	for i := len(episodes.Episodes) - 1; i >= 0; i-- {
+		episode := episodes.Episodes[i]
+		date, err := time.Parse("2006-01-02", episode.Date)
+
+		if err != nil {
+			return nil, err
+		}
+
+		aired := date.Before(time.Now())
+
+		if aired && lastAiredEpisode == nil {
+			lastAiredEpisode = &episode
+			break
+		}
+	}
+
+	if lastAiredEpisode == nil {
+		return nil, fmt.Errorf("Unable to find last aired episode (show: %s)", showID)
+	}
+
+	return lastAiredEpisode, nil
 }
 
 func query(res *request.Response, err error) (*request.Response, error) {
