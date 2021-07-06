@@ -1,7 +1,9 @@
 package request
 
 import (
+	"encoding/json"
 	"errors"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"testing"
@@ -47,7 +49,7 @@ func TestMethods(t *testing.T) {
 			case http.MethodGet:
 				res, err = client.Get("fake", queryParams)
 			case http.MethodPost:
-				res, err = client.Post("fake", queryParams)
+				res, err = client.Post("fake", queryParams, nil)
 			}
 
 			assert.NotNil(t, res)
@@ -64,13 +66,69 @@ func TestRequest(t *testing.T) {
 		queryParams url.Values
 		headers     http.Header
 		method      string
+		body        map[string]string
 	}{
-		{"GetClientError", 0, "Client error", url.Values{}, http.Header{}, http.MethodGet},
-		{"GetError", 401, `{ "error": "Unauthorized" }`, url.Values{}, http.Header{}, http.MethodGet},
-		{"GetData", 200, `{ "data": "the data" }`, url.Values{}, http.Header{}, http.MethodGet},
-		{"GetDataWithHeaders", 200, "", url.Values{}, http.Header{"headerKey": {"headerValue"}}, http.MethodGet},
-		{"GetDataWithQueryParams", 200, "", url.Values{"queryKey": []string{"queryValue"}}, http.Header{}, http.MethodGet},
-		{"PostData", 200, `{ "data": "the data" }`, url.Values{}, http.Header{}, http.MethodGet},
+		{
+			"GetClientError",
+			0,
+			"Client error",
+			url.Values{},
+			http.Header{},
+			http.MethodGet,
+			nil,
+		},
+		{
+			"GetError",
+			401,
+			`{ "error": "Unauthorized" }`,
+			url.Values{},
+			http.Header{},
+			http.MethodGet,
+			nil,
+		},
+		{
+			"GetData",
+			200,
+			`{ "data": "the data" }`,
+			url.Values{},
+			http.Header{},
+			http.MethodGet,
+			nil,
+		},
+		{
+			"GetDataWithHeaders",
+			200,
+			"",
+			url.Values{},
+			http.Header{"headerKey": {"headerValue"}},
+			http.MethodGet,
+			nil,
+		},
+		{
+			"GetDataWithQueryParams",
+			200,
+			"", url.Values{"queryKey": []string{"queryValue"}},
+			http.Header{},
+			http.MethodGet,
+			nil,
+		},
+		{
+			"PostData",
+			200,
+			`{ "data": "the data" }`,
+			url.Values{},
+			http.Header{},
+			http.MethodGet,
+			nil,
+		},
+		{
+			"PostDataWithBody",
+			200,
+			`{ "data": "the data" }`,
+			url.Values{},
+			http.Header{},
+			http.MethodGet,
+			map[string]string{"bodyKey": "bodyValue"}},
 	}
 
 	for _, test := range tests {
@@ -104,11 +162,26 @@ func TestRequest(t *testing.T) {
 						if len(test.headers) > 0 {
 							assert.EqualValues(t, test.headers, req.Header)
 						}
+
+						if len(test.body) > 0 {
+							body, err := ioutil.ReadAll(req.Body)
+							defer req.Body.Close()
+
+							assert.Nil(t, err)
+
+							var bodyJSON map[string]string
+							err = json.Unmarshal(body, &bodyJSON)
+
+							assert.Nil(t, err)
+							assert.EqualValues(t, test.body, bodyJSON)
+
+							assert.Equal(t, "application/json", req.Header.Get("Content-Type"))
+						}
 					},
 				)
 			}
 
-			res, err := client.request(test.method, "fake", test.queryParams)
+			res, err := client.request(test.method, "fake", test.queryParams, test.body)
 
 			if test.statusCode == 0 {
 				assert.Nil(t, res)
