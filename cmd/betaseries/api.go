@@ -57,11 +57,7 @@ func markShowAsWatched(showID string) error {
 		return err
 	}
 
-	fmt.Printf("> %v\n", lastAiredEpisode.Title)
-
-	// TODO(HiDeoo) Mark this episode (and all following) as watched
-
-	return nil
+	return markEpisodeAsWatched(lastAiredEpisode.ID)
 }
 
 func getCurrentShowsWithUnwatchedEpisodesAndPagination(offset int) (*BSShows, error) {
@@ -83,6 +79,16 @@ func getCurrentShowsWithUnwatchedEpisodesAndPagination(offset int) (*BSShows, er
 	}
 
 	return &shows, nil
+}
+
+func markEpisodeAsWatched(episodeID int) error {
+	_, err := query(client.Post(
+		"episodes/watched",
+		nil,
+		map[string]string{"id": strconv.Itoa(episodeID), "bulk": "true"},
+	))
+
+	return err
 }
 
 func getLastAiredEpisode(showID string) (*BSEpisode, error) {
