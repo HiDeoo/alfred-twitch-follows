@@ -17,7 +17,8 @@ type BaseItem struct {
 
 type Item struct {
 	BaseItem
-	Arg string `json:"arg"`
+	Arg  string     `json:"arg"`
+	Mods *Modifiers `json:"mods,omitempty"`
 }
 
 type EmptyItem struct {
@@ -37,7 +38,9 @@ type Modifiers struct {
 }
 
 type Modifier struct {
-	Valid bool `json:"valid"`
+	Valid    bool   `json:"valid"`
+	Arg      string `json:"arg,omitempty"`
+	Subtitle string `json:"subtitle,omitempty"`
 }
 
 type Error struct {
@@ -94,9 +97,9 @@ func newEmptyPlaceholderItem() EmptyItem {
 		},
 		Icon: EmptyItemIcon{"images/error.png"},
 		Mods: Modifiers{
-			Alt:   Modifier{false},
-			Cmd:   Modifier{false},
-			Shift: Modifier{false},
+			Alt:   Modifier{Valid: false},
+			Cmd:   Modifier{Valid: false},
+			Shift: Modifier{Valid: false},
 		},
 	}
 }

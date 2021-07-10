@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -22,12 +23,12 @@ func TestSendResult(t *testing.T) {
 			"ReturnItems",
 			[]Item{
 				{
-					BaseItem{"title item 1", "subtitle item 1"},
-					"arg item 1",
+					BaseItem: BaseItem{"title item 1", "subtitle item 1"},
+					Arg:      "arg item 1",
 				},
 				{
-					BaseItem{"title item 2", "subtitle item 2"},
-					"arg item 2",
+					BaseItem: BaseItem{"title item 2", "subtitle item 2"},
+					Arg:      "arg item 2",
 				},
 			},
 		},
@@ -35,8 +36,18 @@ func TestSendResult(t *testing.T) {
 			"ReturnItem",
 			[]Item{
 				{
-					BaseItem{"title single item", "subtitle single item"},
-					"arg single item",
+					BaseItem: BaseItem{"title single item", "subtitle single item"},
+					Arg:      "arg single item",
+				},
+			},
+		},
+		{
+			"ReturnItemWithModifiers",
+			[]Item{
+				{
+					BaseItem: BaseItem{"title item", "subtitle item"},
+					Arg:      "arg item",
+					Mods:     &Modifiers{Cmd: Modifier{Valid: true}},
 				},
 			},
 		},
@@ -52,6 +63,8 @@ func TestSendResult(t *testing.T) {
 				SendResult(test.items)
 			})
 
+			fmt.Println("output", output)
+
 			result := Result{}
 			err := json.Unmarshal([]byte(output), &result)
 
@@ -66,6 +79,12 @@ func TestSendResult(t *testing.T) {
 					assert.Equal(t, item.Title, resultItem["title"])
 					assert.Equal(t, item.SubTitle, resultItem["subtitle"])
 					assert.Equal(t, item.Arg, resultItem["arg"])
+
+					if item.Mods == nil {
+						assert.Nil(t, resultItem["mods"])
+					} else {
+						assert.NotNil(t, resultItem["mods"])
+					}
 				}
 			} else {
 				assert.Equal(t, 1, len(result.Items))
