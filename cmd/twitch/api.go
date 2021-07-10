@@ -135,7 +135,7 @@ func getCurrentUser() (*TwitchUser, error) {
 	}
 
 	if len(users.Data) != 1 {
-		return nil, errors.New("Unable to get current user")
+		return nil, errors.New("unable to get current user")
 	}
 
 	return &users.Data[0], nil
@@ -146,7 +146,7 @@ func query(res *request.Response, err error) (*request.Response, error) {
 		twitchError := &TwitchError{}
 
 		if err := json.Unmarshal(res.Data, &twitchError); err != nil || twitchError.Error == "" {
-			return nil, fmt.Errorf("Unable to fetch Twitch data (error: %d)", res.StatusCode)
+			return nil, fmt.Errorf("unable to fetch Twitch data (error: %d)", res.StatusCode)
 		}
 
 		return nil, errors.New(twitchError.Message)

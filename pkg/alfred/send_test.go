@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -71,8 +70,6 @@ func TestSendResult(t *testing.T) {
 					SendResult(test.items, Item{BaseItem: BaseItem{}})
 				}
 			})
-
-			fmt.Println("output", output)
 
 			result := Result{}
 			err := json.Unmarshal([]byte(output), &result)

@@ -33,8 +33,6 @@ const userJSON = `{
 	"created_at": "2020-03-01T02:23:44.009756Z"
 }`
 
-var errStr = "Something went wrong!"
-
 func TestGetFollows(t *testing.T) {
 	tests := []apiTest{
 		{"ReturnNoFollows", 0, 1, userJSON},
@@ -128,7 +126,7 @@ func TestGetCurrentUser(t *testing.T) {
 				assert.Equal(t, &expectedUser.Data[0], user)
 			} else {
 				assert.Nil(t, user)
-				assert.Equal(t, "Unable to get current user", err.Error())
+				assert.Equal(t, "unable to get current user", err.Error())
 			}
 		})
 	}
@@ -143,7 +141,7 @@ func TestQuery(t *testing.T) {
 		response string
 		error    string
 	}{
-		{"ReturnError", 401, errStr, "Unable to fetch Twitch data (error: 401)"},
+		{"ReturnError", 401, errStr, "unable to fetch Twitch data (error: 401)"},
 		{"ReturnTwitchError", 401, fmt.Sprintf(`{ "error": "Error", "status": 401, "message": "%s" }`, errStr), errStr},
 	}
 

@@ -125,7 +125,7 @@ func getLastAiredEpisode(showID string) (*BSEpisode, error) {
 	}
 
 	if lastAiredEpisode == nil {
-		return nil, fmt.Errorf("Unable to find last aired episode (show: %s)", showID)
+		return nil, fmt.Errorf("unable to find last aired episode (show: %s)", showID)
 	}
 
 	return lastAiredEpisode, nil
@@ -138,7 +138,7 @@ func query(res *request.Response, err error) (*request.Response, error) {
 		json.Unmarshal(res.Data, &bsError)
 
 		if err := json.Unmarshal(res.Data, &bsError); err != nil {
-			return nil, fmt.Errorf("Unable to fetch BetaSeries data (error: %d)", res.StatusCode)
+			return nil, fmt.Errorf("unable to fetch BetaSeries data (error: %d)", res.StatusCode)
 		}
 
 		return nil, errors.New(bsError.Errors[0].Text)

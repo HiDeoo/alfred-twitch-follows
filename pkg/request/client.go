@@ -87,5 +87,9 @@ func (client *Client) request(
 
 	body, err := ioutil.ReadAll(res.Body)
 
+	if err != nil {
+		return nil, err
+	}
+
 	return &Response{body, res.StatusCode}, nil
 }

@@ -170,7 +170,7 @@ func TestQuery(t *testing.T) {
 		response string
 		error    string
 	}{
-		{"ReturnError", 401, errStr, "Unable to fetch BetaSeries data (error: 401)"},
+		{"ReturnError", 401, errStr, "unable to fetch BetaSeries data (error: 401)"},
 		{"ReturnBSError", 401, fmt.Sprintf(`{ "errors": [{ "code": 401 , "text": "%s" }] }`, errStr), errStr},
 	}
 
