@@ -16,8 +16,9 @@ import (
 
 func TestSendResult(t *testing.T) {
 	tests := []struct {
-		name  string
-		items []Item
+		name      string
+		items     []Item
+		emptyItem *Item
 	}{
 		{
 			"ReturnItems",
@@ -31,6 +32,7 @@ func TestSendResult(t *testing.T) {
 					Arg:      "arg item 2",
 				},
 			},
+			nil,
 		},
 		{
 			"ReturnItem",
@@ -40,6 +42,7 @@ func TestSendResult(t *testing.T) {
 					Arg:      "arg single item",
 				},
 			},
+			nil,
 		},
 		{
 			"ReturnItemWithModifiers",
@@ -50,17 +53,23 @@ func TestSendResult(t *testing.T) {
 					Mods:     &Modifiers{Cmd: Modifier{Valid: true}},
 				},
 			},
+			nil,
 		},
 		{
 			"ReturnNoItems",
 			[]Item{},
+			&Item{BaseItem: BaseItem{"empty item title", "empty item subtitle"}},
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			output := captureOutput(func() {
-				SendResult(test.items)
+				if test.emptyItem != nil {
+					SendResult(test.items, *test.emptyItem)
+				} else {
+					SendResult(test.items, Item{BaseItem: BaseItem{}})
+				}
 			})
 
 			fmt.Println("output", output)
@@ -90,7 +99,7 @@ func TestSendResult(t *testing.T) {
 				assert.Equal(t, 1, len(result.Items))
 
 				item := result.Items[0].(map[string]interface{})
-				placeholder := newEmptyPlaceholderItem()
+				placeholder := newEmptyPlaceholderItem(*test.emptyItem)
 
 				assert.Equal(t, placeholder.Title, item["title"])
 				assert.Equal(t, placeholder.SubTitle, item["subtitle"])

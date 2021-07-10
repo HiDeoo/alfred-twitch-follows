@@ -49,7 +49,7 @@ type Error struct {
 	Icon  EmptyItemIcon `json:"icon"`
 }
 
-func SendResult(items []Item) {
+func SendResult(items []Item, emptyItem Item) {
 	var result Result
 
 	if len(items) > 0 {
@@ -59,7 +59,7 @@ func SendResult(items []Item) {
 			result.Items[i] = item
 		}
 	} else {
-		result = Result{Items: []interface{}{newEmptyPlaceholderItem()}}
+		result = Result{Items: []interface{}{newEmptyPlaceholderItem(emptyItem)}}
 	}
 
 	send(result)
@@ -89,12 +89,9 @@ func send(data interface{}) {
 	log.Panicln(err)
 }
 
-func newEmptyPlaceholderItem() EmptyItem {
+func newEmptyPlaceholderItem(emptyItem Item) EmptyItem {
 	return EmptyItem{
-		Item: Item{
-			BaseItem: BaseItem{"You're alone! ¯\\_(ツ)_/¯", "Try browsing Twitch…"},
-			Arg:      "https://www.twitch.tv/directory/following",
-		},
+		Item: emptyItem,
 		Icon: EmptyItemIcon{"images/error.png"},
 		Mods: Modifiers{
 			Alt:   Modifier{Valid: false},

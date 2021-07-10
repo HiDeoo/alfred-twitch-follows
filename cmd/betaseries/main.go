@@ -31,7 +31,10 @@ func main() {
 	}
 
 	if !shouldMarkShowAsWatched {
-		alfred.SendResult(items)
+		alfred.SendResult(items, alfred.Item{
+			BaseItem: alfred.BaseItem{Title: "You've watched everything! ¯\\_(ツ)_/¯", SubTitle: "Try browsing BetaSeries…"},
+			Arg:      "https://www.betaseries.com/",
+		})
 	}
 }
 

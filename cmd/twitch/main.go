@@ -26,7 +26,10 @@ func main() {
 		return
 	}
 
-	alfred.SendResult(items)
+	alfred.SendResult(items, alfred.Item{
+		BaseItem: alfred.BaseItem{Title: "You're alone! ¯\\_(ツ)_/¯", SubTitle: "Try browsing Twitch…"},
+		Arg:      "https://www.twitch.tv/directory/following",
+	})
 }
 
 func getFollowItems(getter func() ([]TwitchFollow, error)) ([]alfred.Item, error) {
