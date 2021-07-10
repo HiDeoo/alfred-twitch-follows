@@ -41,6 +41,81 @@ func TestGetCurrentShowsWithUnwatchedEpisodes(t *testing.T) {
 	}
 }
 
+func TestMarkShowAsWatched(t *testing.T) {
+	tests := []struct {
+		name    string
+		success bool
+	}{
+		{"ReturnNoError", true},
+		{"ReturnError", false},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			mockClient := new(request.MockClient)
+			client.SetClient(mockClient)
+
+			if test.success {
+				mockClient.On("Do", mock.Anything).Return(request.MockResponse(200, `{ "episode": "data" }`), nil).Once()
+			} else {
+				mockClient.On("Do", mock.Anything).Return(
+					request.MockResponse(400, `{ "errors": [{ "code": 4001 , "text": "L'épisode avec l'ID X n'existe pas." }] }`),
+					nil,
+				).Once()
+			}
+
+			err := markEpisodeAsWatched(987654321)
+
+			if test.success {
+				assert.Nil(t, err)
+			} else {
+				assert.NotNil(t, err)
+			}
+		})
+	}
+}
+
+func TestMarkEpisodeAsWatched(t *testing.T) {
+	tests := []struct {
+		name                 string
+		success              bool
+		lastAiredEpisodeDate string
+	}{
+		{"ReturnNoError", true, "2020-10-22"},
+		{"ReturnErrorWithNoLastAiredEpisode", false, "2025-11-22"},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			mockClient := new(request.MockClient)
+			client.SetClient(mockClient)
+
+			episodes := BSEpisodes{[]BSEpisode{{ID: 987654321, Date: "2020-10-22"}}, BSErrors{}}
+			episodesJSON, err := json.Marshal(episodes)
+			assert.Nil(t, err)
+
+			mockClient.On("Do", mock.Anything).Return(request.MockResponse(200, string(episodesJSON)), nil).Once()
+
+			if test.success {
+				mockClient.On("Do", mock.Anything).Return(request.MockResponse(200, `{ "episode": "data" }`), nil).Once()
+			} else {
+				mockClient.On("Do", mock.Anything).Return(
+					request.MockResponse(400, `{ "errors": [{ "code": 4001 , "text": "L'épisode avec l'ID X n'existe pas." }] }`),
+					nil,
+				).Once()
+			}
+
+			err = markShowAsWatched("123456789")
+
+			if test.success {
+				assert.Nil(t, err)
+			} else {
+				assert.NotNil(t, err)
+			}
+		})
+	}
+}
+
 func TestGetLastAiredEpisode(t *testing.T) {
 	tests := []struct {
 		name             string
