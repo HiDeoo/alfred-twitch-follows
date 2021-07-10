@@ -50,6 +50,44 @@ You can also use the `--live` option to only return Twitch Follows that are curr
 | `TWITCH_CLIENT_ID`   | A Twitch application client ID.                                |
 | `TWITCH_OAUTH_TOKEN` | A Twitch User access token with the `user:read:follows` scope. |
 
+## BetaSeries
+
+`cmd/betaseries` fetches Shows with Unwatched Episode(s) for a specific [BetaSeries](https://www.betaseries.com) User.
+
+### Usage
+
+`cmd/betaseries` can be executed in a [Run Script Action](https://www.alfredapp.com/help/workflows/actions/run-script/) to return BetaSeries Shows:
+
+```shell
+$ betaseries
+{
+  "items": [
+    {
+      "title": "Show 1",
+      "subtitle": "2 episodes remaining (90 total)",
+      "arg": "123456"
+    },
+    {
+      "title": "Show 2",
+      "subtitle": "3 episodes remaining (5 total)",
+      "arg": "456789"
+    },
+    …
+  ]
+}
+```
+
+You can also use the `--watched` option to mark all Aired Unwatched Episodes of a BetaSeries Shows as watched.
+
+### Configuration
+
+`cmd/betaseries` consumes various environment variables that should be [provided by Alfred](https://www.alfredapp.com/help/workflows/advanced/variables/#environment) when invoking the script in a workflow:
+
+| Environment variable     | Description                         |
+| ------------------------ | ----------------------------------- |
+| `BETASERIES_CLIENT_ID`   | A BetaSeries application client ID. |
+| `BETASERIES_OAUTH_TOKEN` | A BetaSeries User access token.     |
+
 ## Contribute
 
 1. [Fork](https://help.github.com/articles/fork-a-repo) & [clone](https://help.github.com/articles/cloning-a-repository) this repository.
