@@ -88,6 +88,41 @@ You can also use the `--watched` option to mark all Aired Unwatched Episodes of 
 | `BETASERIES_CLIENT_ID`   | A BetaSeries application client ID. |
 | `BETASERIES_OAUTH_TOKEN` | A BetaSeries User access token.     |
 
+## GitHub
+
+`cmd/github` fetches Repositories for a specific [GitHub](https://github.com/) User sorted by last push.
+
+### Usage
+
+`cmd/github` can be executed in a [Run Script Action](https://www.alfredapp.com/help/workflows/actions/run-script/) to return GitHub Repositories:
+
+```shell
+$ github
+{
+  "items": [
+    {
+      "title": "user/repo1",
+      "subtitle": "Updated 2 hours ago",
+      "arg": "https://www.github.com/user/repo1"
+    },
+    {
+      "title": "org/repo2",
+      "subtitle": "Updated 5 days ago",
+      "arg": "https://www.github.com/org/repo2"
+    },
+    …
+  ]
+}
+```
+
+### Configuration
+
+`cmd/github` consumes an environment variables that should be [provided by Alfred](https://www.alfredapp.com/help/workflows/advanced/variables/#environment) when invoking the script in a workflow:
+
+| Environment variable | Description                     |
+| -------------------- | ------------------------------- |
+| `GITHUB_OAUTH_TOKEN` | A GitHub personal access token. |
+
 ## Contribute
 
 1. [Fork](https://help.github.com/articles/fork-a-repo) & [clone](https://help.github.com/articles/cloning-a-repository) this repository.
