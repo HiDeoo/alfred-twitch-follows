@@ -71,7 +71,7 @@ type BSShow struct {
 	ResourceURL string     `json:"resource_url"`
 	Platforms   struct {
 		Svods []struct {
-			ID        string      `json:"id"`
+			ID        int         `json:"id"`
 			Name      string      `json:"name"`
 			Tag       interface{} `json:"tag"`
 			LinkURL   string      `json:"link_url"`
@@ -82,7 +82,7 @@ type BSShow struct {
 			Logo string `json:"logo"`
 		} `json:"svods"`
 		Svod struct {
-			ID        string      `json:"id"`
+			ID        int         `json:"id"`
 			Name      string      `json:"name"`
 			Tag       interface{} `json:"tag"`
 			LinkURL   string      `json:"link_url"`
