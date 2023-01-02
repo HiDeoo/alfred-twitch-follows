@@ -79,6 +79,29 @@ func GetFollowedStreams() ([]TwitchStream, error) {
 	return allStreams, nil
 }
 
+func GetGameStreams(game string, lang string) ([]TwitchStream, error) {
+	var cursor = ""
+	var allStreams []TwitchStream
+
+	for {
+		streams, err := getGameStreamsWithPagination(game, lang, cursor)
+
+		if err != nil {
+			return nil, err
+		}
+
+		allStreams = append(allStreams, streams.Data...)
+
+		if len(streams.Pagination.Cursor) == 0 {
+			break
+		}
+
+		cursor = streams.Pagination.Cursor
+	}
+
+	return allStreams, nil
+}
+
 func getFollowsWithPagination(userID string, cursor string) (*TwitchFollows, error) {
 	queryParams := url.Values{}
 	queryParams.Set("from_id", userID)
@@ -107,6 +130,32 @@ func getFollowedStreamsWithPagination(userID string, cursor string) (*TwitchStre
 	queryParams.Set("after", cursor)
 
 	res, err := query(client.Get("streams/followed", queryParams))
+
+	if err != nil {
+		return nil, err
+	}
+
+	streams := TwitchStreams{}
+
+	if err = json.Unmarshal(res.Data, &streams); err != nil {
+		return nil, err
+	}
+
+	return &streams, nil
+}
+
+func getGameStreamsWithPagination(game string, lang string, cursor string) (*TwitchStreams, error) {
+	queryParams := url.Values{}
+	queryParams.Set("first", "100")
+	queryParams.Set("type", "live")
+	queryParams.Set("game_id", game)
+	queryParams.Set("after", cursor)
+
+	if len(lang) > 0 {
+		queryParams.Set("language", lang)
+	}
+
+	res, err := query(client.Get("streams", queryParams))
 
 	if err != nil {
 		return nil, err
