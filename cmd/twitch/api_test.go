@@ -91,6 +91,39 @@ func TestGetFollowedStreams(t *testing.T) {
 	}
 }
 
+func TestGetGameStreams(t *testing.T) {
+	tests := []apiTest{
+		{"ReturnNoGameStreams", 0, 1, ""},
+		{"ReturnGameStreams", 2, 1, ""},
+		{"ReturnGameStreamsWithPagination", 2, 2, ""},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			testAPI(t, test, func(index int) interface{} {
+				return TwitchStream{
+					Id:           strconv.Itoa(index),
+					UserId:       fmt.Sprintf("1234560%d", index),
+					UserLogin:    fmt.Sprintf("user%d", index),
+					UserName:     fmt.Sprintf("User%d", index),
+					GameId:       fmt.Sprintf("game%d", index),
+					GameName:     fmt.Sprintf("Game%d", index),
+					Type:         "live",
+					Title:        fmt.Sprintf("Stream Title %d", index),
+					ViewerCount:  index * 100,
+					StartedAt:    fmt.Sprintf("2020-02-01T02:23:4%d.009756Z", index),
+					Language:     "fr",
+					ThumbnailUrl: fmt.Sprintf("https://twitch.tv/stream/%d/thumbnail.png", index),
+					TagIds:       []string{"1122334455"},
+					IsMature:     false,
+				}
+			}, func() (interface{}, error) {
+				return GetGameStreams("game1", "fr")
+			})
+		})
+	}
+}
+
 func TestGetCurrentUser(t *testing.T) {
 	tests := []struct {
 		name      string
@@ -170,10 +203,12 @@ func testAPI(
 		mockClient := new(request.MockClient)
 		client.SetClient(mockClient)
 
-		mockClient.On("Do", mock.Anything).Return(
-			request.MockResponse(200, fmt.Sprintf(`{ "data": [%s] }`, test.user)),
-			nil,
-		).Once()
+		if len(test.user) > 0 {
+			mockClient.On("Do", mock.Anything).Return(
+				request.MockResponse(200, fmt.Sprintf(`{ "data": [%s] }`, test.user)),
+				nil,
+			).Once()
+		}
 
 		var cursor string
 		entityIndex := 0

@@ -14,7 +14,7 @@ The results are returned using the [Alfred Script Filter JSON Format](https://ww
 
 ## Twitch
 
-`cmd/twitch` fetches Follows (or only Live Follows) for a specific [Twitch](https://twitch.tv) User.
+`cmd/twitch` fetches Follows (or only Live Follows) for a specific [Twitch](https://twitch.tv) User or a list of Live Streams for a specific Game (and optionally in a specific Language).
 
 ### Usage
 
@@ -39,7 +39,7 @@ $ twitch
 }
 ```
 
-You can also use the `--live` option to only return Twitch Follows that are currently live.
+You can also use the `--live` option to only return Twitch Follows that are currently live or alternatively the `--game` option to only return Twitch Live Streams for a specific Game ID (and optionally in a specific Language by using the `--gameLang` option with an ISO 639-1 two-letter language code).
 
 ### Configuration
 
