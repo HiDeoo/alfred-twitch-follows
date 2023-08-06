@@ -1,10 +1,26 @@
 package main
 
 import (
+	"flag"
+
 	"github.com/HiDeoo/alfred-workflow-tools/pkg/alfred"
 )
 
 func main() {
+	clearCache := flag.Bool("clear", false, "clear the cache")
+
+	flag.Parse()
+
+	if *clearCache {
+		err := alfred.ClearCache()
+
+		if err != nil {
+			alfred.SendError(err)
+		}
+
+		return
+	}
+
 	var items []alfred.Item
 	var err error
 

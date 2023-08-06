@@ -38,6 +38,14 @@ func SetCache(cache any) error {
 	return os.WriteFile(getCachePath(), data, 0644)
 }
 
+func ClearCache() error {
+	if _, err := os.Stat(getCachePath()); err == nil {
+		return os.Remove(getCachePath())
+	}
+
+	return nil
+}
+
 func ensureCacheDir() error {
 	if _, err := os.Stat(getCacheDirPath()); os.IsNotExist(err) {
 		return os.MkdirAll(getCacheDirPath(), 0755)
