@@ -23,7 +23,16 @@ func main() {
 }
 
 func getRepos(getter func() ([]GHRepo, error)) ([]alfred.Item, error) {
-	repos, err := getter()
+	var repos []GHRepo
+	var err error
+	var updateCache = false
+
+	alfred.GetCache(&repos)
+
+	if repos == nil {
+		updateCache = true
+		repos, err = getter()
+	}
 
 	if err != nil {
 		return nil, err
@@ -43,6 +52,10 @@ func getRepos(getter func() ([]GHRepo, error)) ([]alfred.Item, error) {
 			},
 			Arg: repo.HtmlURL,
 		}
+	}
+
+	if updateCache {
+		alfred.SetCache(repos)
 	}
 
 	return items, nil
