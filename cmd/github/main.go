@@ -12,7 +12,7 @@ func main() {
 	var items []alfred.Item
 	var err error
 
-	items, err = getRepos(GetCurrentUserRepos)
+	items, err = getRepos(GetAllRepos)
 
 	if err != nil {
 		alfred.SendError(err)
@@ -45,7 +45,7 @@ func getRepos(getter func() ([]GHRepo, error)) ([]alfred.Item, error) {
 		items[i] = alfred.Item{
 			BaseItem: alfred.BaseItem{
 				Title:    repo.FullName,
-				SubTitle: fmt.Sprintf("Updated %s", timeago.Of(pushedAt)),
+				SubTitle: fmt.Sprintf("Last activity %s", timeago.Of(pushedAt)),
 			},
 			Arg: repo.HtmlURL,
 		}

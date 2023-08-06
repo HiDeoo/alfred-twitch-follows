@@ -90,7 +90,7 @@ You can also use the `--watched` option to mark all Aired Unwatched Episodes of 
 
 ## GitHub
 
-`cmd/github` fetches Repositories for a specific [GitHub](https://github.com/) User sorted by last push.
+`cmd/github` fetches Repositories and Recent Contributions for a specific [GitHub](https://github.com/) User sorted by last push or contribution date.
 
 ### Usage
 
@@ -102,12 +102,12 @@ $ github
   "items": [
     {
       "title": "user/repo1",
-      "subtitle": "Updated 2 hours ago",
+      "subtitle": "Last activity 2 hours ago",
       "arg": "https://www.github.com/user/repo1"
     },
     {
       "title": "org/repo2",
-      "subtitle": "Updated 5 days ago",
+      "subtitle": "Last activity 5 days ago",
       "arg": "https://www.github.com/org/repo2"
     },
     …

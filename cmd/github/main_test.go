@@ -42,7 +42,7 @@ func TestGetRepos(t *testing.T) {
 
 			for i, item := range items {
 				assert.Equal(t, repos[i].FullName, item.Title)
-				assert.Regexp(t, regexp.MustCompile("^Updated "), item.SubTitle)
+				assert.Regexp(t, regexp.MustCompile("^Last activity "), item.SubTitle)
 				assert.Equal(t, repos[i].HtmlURL, item.Arg)
 			}
 		})

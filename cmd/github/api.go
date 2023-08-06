@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"sort"
 	"strconv"
 
 	"github.com/HiDeoo/alfred-workflow-tools/pkg/request"
@@ -23,6 +24,32 @@ func init() {
 		"Accept":        []string{"application/vnd.github+json"},
 		"Authorization": []string{"Token " + os.Getenv("GITHUB_OAUTH_TOKEN")},
 	})
+}
+
+func GetAllRepos() ([]GHRepo, error) {
+	var allRepos []GHRepo
+
+	userRepos, err := GetCurrentUserRepos()
+
+	if err != nil {
+		return nil, err
+	}
+
+	allRepos = append(allRepos, userRepos...)
+
+	contributionRepos, err := GetCurrentUserContributionRepos()
+
+	if err != nil {
+		return nil, err
+	}
+
+	allRepos = append(allRepos, contributionRepos...)
+
+	sort.Slice(allRepos, func(i, j int) bool {
+		return allRepos[i].PushedAt > allRepos[j].PushedAt
+	})
+
+	return allRepos, nil
 }
 
 func GetCurrentUserRepos() ([]GHRepo, error) {
@@ -46,6 +73,59 @@ func GetCurrentUserRepos() ([]GHRepo, error) {
 	}
 
 	return allRepos, nil
+}
+
+func GetCurrentUserContributionRepos() ([]GHRepo, error) {
+	res, err := query(client.Post("graphql", nil, map[string]string{"query": `query {
+		viewer {
+			contributionsCollection {
+				pullRequestContributionsByRepository(maxRepositories: 100) {
+					repository {
+						isFork
+						nameWithOwner
+						owner {
+							login
+						}
+						url
+					}
+					contributions(last: 1, orderBy:{direction:ASC}) {
+						nodes {
+							pullRequest {
+								createdAt
+							}
+						}
+					}
+				}
+			}
+		}
+	}`}))
+
+	if err != nil {
+		return nil, err
+	}
+
+	contributions := GHContributions{}
+
+	if err = json.Unmarshal(res.Data, &contributions); err != nil {
+		return nil, err
+	}
+
+	var repos []GHRepo
+
+	for _, contribution := range contributions.Data.Viewer.ContributionsCollection.PullRequestContributionsByRepository {
+		if contribution.Repository.Owner.Login == "HiDeoo" || contribution.Repository.IsFork || len(contribution.Contributions.Nodes) == 0 {
+			continue
+		}
+
+		repos = append(repos, GHRepo{
+			ID:       contribution.Repository.ID,
+			FullName: contribution.Repository.NameWithOwner,
+			HtmlURL:  contribution.Repository.URL,
+			PushedAt: contribution.Contributions.Nodes[0].PullRequest.CreatedAt,
+		})
+	}
+
+	return repos, nil
 }
 
 func GetCurrentUserReposWithPagination(page int) ([]GHRepo, error) {

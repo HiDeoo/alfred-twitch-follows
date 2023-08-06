@@ -18,6 +18,11 @@ type apiTest struct {
 	lastPageEntityCount int
 }
 
+type gqlApiTest struct {
+	name  string
+	count int
+}
+
 func TestGetCurrentUserRepos(t *testing.T) {
 	tests := []apiTest{
 		{"ReturnNoRepos", 1, 0},
@@ -36,6 +41,42 @@ func TestGetCurrentUserRepos(t *testing.T) {
 				}
 			}, func() (interface{}, error) {
 				return GetCurrentUserRepos()
+			})
+		})
+	}
+}
+
+func TestGetCurrentUserContributions(t *testing.T) {
+	tests := []gqlApiTest{
+		{"ReturnNoContributions", 0},
+		{"ReturnContributions", 3},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			testGqlAPI(t, test, func(index int) interface{} {
+				return GHPullRequestContributionsByRepository{
+					Repository: GHRepository{
+						ID:            123456789 + index,
+						IsFork:        false,
+						NameWithOwner: fmt.Sprintf("user/repo %d", index),
+						Owner: GHOwner{
+							Login: fmt.Sprintf("Login %d", index),
+						},
+						URL: fmt.Sprintf("https://github.com/user/repo%d", index),
+					},
+					Contributions: GHContribution{
+						Nodes: []GHNode{
+							{
+								PullRequest: GHPullRequest{
+									CreatedAt: time.Now().Format(time.RFC3339),
+								},
+							},
+						},
+					},
+				}
+			}, func() (interface{}, error) {
+				return GetCurrentUserContributionRepos()
 			})
 		})
 	}
@@ -118,6 +159,63 @@ func testAPI(
 
 		for _, entityPage := range entityPages {
 			expectedEntities = append(expectedEntities, entityPage...)
+		}
+
+		assert.ElementsMatch(t, expectedEntities, entities)
+	})
+}
+
+func testGqlAPI(
+	t *testing.T,
+	test gqlApiTest,
+	newEntity func(index int) interface{},
+	getEntities func() (interface{}, error),
+) {
+	t.Run(test.name, func(t *testing.T) {
+		mockClient := new(request.MockClient)
+		client.SetClient(mockClient)
+
+		entityPage := make([]interface{}, test.count)
+
+		for i := 0; i < test.count; i++ {
+			entityJSON := newEntity(i)
+			entityPage[i] = entityJSON
+		}
+
+		entityPageJSON, err := json.Marshal(entityPage)
+		fmt.Println(string(entityPageJSON))
+		assert.Nil(t, err)
+
+		mockClient.On("Do", mock.Anything).Return(request.MockResponse(
+			200,
+			fmt.Sprintf(`{
+				"data": {
+					"viewer": {
+						"contributionsCollection": {
+							"pullRequestContributionsByRepository": %s
+						}
+					}
+				}
+			}`, entityPageJSON),
+		), nil).Once()
+
+		entities, err := getEntities()
+		entitySlice, ok := getEntitySlice(entities)
+
+		assert.Equal(t, true, ok)
+
+		assert.Equal(t, test.count, entitySlice.Len())
+		assert.Nil(t, err)
+
+		expectedEntities := make([]interface{}, 0)
+
+		for _, entityPage := range entityPage {
+			expectedEntities = append(expectedEntities, GHRepo{
+				ID:       entityPage.(GHPullRequestContributionsByRepository).Repository.ID,
+				FullName: entityPage.(GHPullRequestContributionsByRepository).Repository.NameWithOwner,
+				HtmlURL:  entityPage.(GHPullRequestContributionsByRepository).Repository.URL,
+				PushedAt: entityPage.(GHPullRequestContributionsByRepository).Contributions.Nodes[0].PullRequest.CreatedAt,
+			})
 		}
 
 		assert.ElementsMatch(t, expectedEntities, entities)
