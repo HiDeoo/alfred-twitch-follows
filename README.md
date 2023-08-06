@@ -90,7 +90,7 @@ You can also use the `--watched` option to mark all Aired Unwatched Episodes of 
 
 ## GitHub
 
-`cmd/github` fetches Repositories and Recent Contributions for a specific [GitHub](https://github.com/) User sorted by last push or contribution date.
+`cmd/github` fetches Repositories and Recent Contributions for a specific [GitHub](https://github.com/) User.
 
 ### Usage
 

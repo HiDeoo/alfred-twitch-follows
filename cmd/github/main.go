@@ -1,11 +1,7 @@
 package main
 
 import (
-	"fmt"
-	"time"
-
 	"github.com/HiDeoo/alfred-workflow-tools/pkg/alfred"
-	timeago "github.com/caarlos0/timea.go"
 )
 
 func main() {
@@ -36,8 +32,6 @@ func getRepos(getter func() ([]GHRepo, error)) ([]alfred.Item, error) {
 	items := make([]alfred.Item, len(repos))
 
 	for i, repo := range repos {
-		pushedAt, err := time.Parse(time.RFC3339, repo.PushedAt)
-
 		if err != nil {
 			return nil, err
 		}
@@ -45,7 +39,7 @@ func getRepos(getter func() ([]GHRepo, error)) ([]alfred.Item, error) {
 		items[i] = alfred.Item{
 			BaseItem: alfred.BaseItem{
 				Title:    repo.FullName,
-				SubTitle: fmt.Sprintf("Last activity %s", timeago.Of(pushedAt)),
+				SubTitle: repo.HtmlURL,
 			},
 			Arg: repo.HtmlURL,
 		}
