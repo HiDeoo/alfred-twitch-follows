@@ -1,18 +1,30 @@
 package main
 
 import (
-	"fmt"
-	"time"
+	"flag"
 
 	"github.com/HiDeoo/alfred-workflow-tools/pkg/alfred"
-	timeago "github.com/caarlos0/timea.go"
 )
 
 func main() {
+	clearCache := flag.Bool("clear", false, "clear the cache")
+
+	flag.Parse()
+
+	if *clearCache {
+		err := alfred.ClearCache()
+
+		if err != nil {
+			alfred.SendError(err)
+		}
+
+		return
+	}
+
 	var items []alfred.Item
 	var err error
 
-	items, err = getRepos(GetCurrentUserRepos)
+	items, err = getRepos(GetAllRepos)
 
 	if err != nil {
 		alfred.SendError(err)
@@ -27,7 +39,16 @@ func main() {
 }
 
 func getRepos(getter func() ([]GHRepo, error)) ([]alfred.Item, error) {
-	repos, err := getter()
+	var repos []GHRepo
+	var err error
+	var updateCache = false
+
+	alfred.GetCache(&repos)
+
+	if repos == nil {
+		updateCache = true
+		repos, err = getter()
+	}
 
 	if err != nil {
 		return nil, err
@@ -36,8 +57,6 @@ func getRepos(getter func() ([]GHRepo, error)) ([]alfred.Item, error) {
 	items := make([]alfred.Item, len(repos))
 
 	for i, repo := range repos {
-		pushedAt, err := time.Parse(time.RFC3339, repo.PushedAt)
-
 		if err != nil {
 			return nil, err
 		}
@@ -45,10 +64,14 @@ func getRepos(getter func() ([]GHRepo, error)) ([]alfred.Item, error) {
 		items[i] = alfred.Item{
 			BaseItem: alfred.BaseItem{
 				Title:    repo.FullName,
-				SubTitle: fmt.Sprintf("Updated %s", timeago.Of(pushedAt)),
+				SubTitle: repo.HtmlURL,
 			},
 			Arg: repo.HtmlURL,
 		}
+	}
+
+	if updateCache {
+		alfred.SetCache(repos)
 	}
 
 	return items, nil
