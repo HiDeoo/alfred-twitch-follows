@@ -90,7 +90,7 @@ You can also use the `--watched` option to mark all Aired Unwatched Episodes of 
 
 ## GitHub
 
-`cmd/github` fetches Repositories and Recent Contributions for a specific [GitHub](https://github.com/) User.
+`cmd/github` fetches Repositories and Recent Contributions for a specific [GitHub](https://github.com/) User. Repositories are cached if the `alfred_workflow_cache` environment variable (automatically provided by Alfred) is set.
 
 ### Usage
 
@@ -114,6 +114,8 @@ $ github
   ]
 }
 ```
+
+You can use the `--clear` option to clear the cached GitHub Repositories.
 
 ### Configuration
 
