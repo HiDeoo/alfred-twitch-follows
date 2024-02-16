@@ -45,11 +45,21 @@ func GetAllRepos() ([]GHRepo, error) {
 
 	allRepos = append(allRepos, contributionRepos...)
 
-	sort.Slice(allRepos, func(i, j int) bool {
-		return allRepos[i].PushedAt > allRepos[j].PushedAt
+	var repoFullNames = map[string]struct{}{}
+	var dedupedRepos []GHRepo
+
+	for _, repo := range allRepos {
+		if _, exists := repoFullNames[repo.FullName]; !exists {
+			dedupedRepos = append(dedupedRepos, repo)
+			repoFullNames[repo.FullName] = struct{}{}
+		}
+	}
+
+	sort.Slice(dedupedRepos, func(i, j int) bool {
+		return dedupedRepos[i].PushedAt > dedupedRepos[j].PushedAt
 	})
 
-	return allRepos, nil
+	return dedupedRepos, nil
 }
 
 func GetCurrentUserRepos() ([]GHRepo, error) {
